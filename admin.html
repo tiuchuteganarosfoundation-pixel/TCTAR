@@ -1,0 +1,630 @@
+<!DOCTYPE html>
+<html lang="fil">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Panel — TCTAR Farm School</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --green-dark: #1B4332;
+      --green-mid:  #40916C;
+      --green-light:#D8F3DC;
+      --gold:       #D4A017;
+      --bg:         #F2F7F2;
+      --white:      #FFFFFF;
+      --text:       #1C1C1C;
+      --muted:      #5A6B5A;
+      --danger:     #C0392B;
+      --radius:     8px;
+      --shadow:     0 2px 12px rgba(27,67,50,0.1);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); }
+
+    /* LOGIN */
+    #loginScreen {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--green-dark);
+    }
+
+    .login-box {
+      background: var(--white);
+      border-radius: 16px;
+      padding: 48px 40px;
+      width: 100%;
+      max-width: 380px;
+      text-align: center;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.3);
+    }
+
+    .login-box img {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin: 0 auto 16px;
+      border: 2px solid var(--green-mid);
+    }
+
+    .login-box h1 {
+      font-size: 1.2rem;
+      color: var(--green-dark);
+      margin-bottom: 4px;
+    }
+
+    .login-box p {
+      font-size: 0.82rem;
+      color: var(--muted);
+      margin-bottom: 28px;
+    }
+
+    .field {
+      margin-bottom: 16px;
+      text-align: left;
+    }
+
+    .field label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--green-dark);
+      margin-bottom: 6px;
+    }
+
+    .field input, .field textarea, .field select {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1.5px solid #D0E4D8;
+      border-radius: var(--radius);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      color: var(--text);
+      background: var(--white);
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .field input:focus, .field textarea:focus {
+      border-color: var(--green-mid);
+    }
+
+    .field textarea { resize: vertical; min-height: 80px; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: 30px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: opacity 0.15s;
+    }
+
+    .btn:hover { opacity: 0.88; }
+    .btn-primary { background: var(--green-dark); color: var(--white); width: 100%; justify-content: center; }
+    .btn-green { background: var(--green-mid); color: var(--white); }
+    .btn-gold { background: var(--gold); color: var(--green-dark); }
+    .btn-danger { background: var(--danger); color: var(--white); }
+    .btn-sm { padding: 6px 14px; font-size: 0.8rem; }
+
+    .login-error {
+      color: var(--danger);
+      font-size: 0.82rem;
+      margin-top: 8px;
+      display: none;
+    }
+
+    /* ADMIN LAYOUT */
+    #adminPanel { display: none; min-height: 100vh; }
+
+    .admin-nav {
+      background: var(--green-dark);
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .admin-nav-brand {
+      color: var(--white);
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .admin-nav-brand span {
+      font-size: 0.75rem;
+      font-weight: 400;
+      color: rgba(255,255,255,0.6);
+      margin-left: 8px;
+    }
+
+    .admin-content {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 36px 24px;
+    }
+
+    .admin-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 28px;
+      border-bottom: 2px solid #D0E4D8;
+      padding-bottom: 0;
+    }
+
+    .tab-btn {
+      background: none;
+      border: none;
+      padding: 10px 20px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      transition: color 0.2s;
+    }
+
+    .tab-btn.active {
+      color: var(--green-dark);
+      border-bottom-color: var(--green-dark);
+    }
+
+    .tab-panel { display: none; }
+    .tab-panel.active { display: block; }
+
+    .card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 28px;
+      box-shadow: var(--shadow);
+      margin-bottom: 20px;
+    }
+
+    .card h3 {
+      font-size: 1rem;
+      color: var(--green-dark);
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid var(--green-light);
+    }
+
+    .item-list { display: flex; flex-direction: column; gap: 12px; }
+
+    .item-row {
+      background: var(--bg);
+      border-radius: var(--radius);
+      padding: 14px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+    }
+
+    .item-content { flex: 1; }
+    .item-content strong { font-size: 0.9rem; color: var(--green-dark); }
+    .item-content p { font-size: 0.82rem; color: var(--muted); margin-top: 4px; }
+
+    .item-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--green-dark);
+      color: var(--white);
+      padding: 12px 20px;
+      border-radius: var(--radius);
+      font-size: 0.875rem;
+      font-weight: 500;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.3s, transform 0.3s;
+      pointer-events: none;
+      z-index: 999;
+    }
+
+    .toast.show { opacity: 1; transform: translateY(0); }
+
+    .empty-state {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.85rem;
+      padding: 24px;
+      font-style: italic;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================================
+       LOGIN SCREEN
+  ============================================================ -->
+  <div id="loginScreen">
+    <div class="login-box">
+      <img src="assets/logo.png" alt="Logo" />
+      <h1>Admin Panel</h1>
+      <p>TCTAR Foundation Integrated Farm School</p>
+      <div class="field">
+        <label>Password</label>
+        <input type="password" id="passwordInput" placeholder="Ilagay ang password" onkeydown="if(event.key==='Enter')login()" />
+      </div>
+      <button class="btn btn-primary" onclick="login()">Pumasok</button>
+      <p class="login-error" id="loginError">Maling password. Subukan muli.</p>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       ADMIN PANEL
+  ============================================================ -->
+  <div id="adminPanel">
+    <nav class="admin-nav">
+      <div class="admin-nav-brand">
+        TCTAR Admin Panel
+        <span>Pamamahala ng Website</span>
+      </div>
+      <div style="display:flex; gap:12px; align-items:center;">
+        <a href="index.html" style="color:rgba(255,255,255,0.7); font-size:0.82rem;">← Bumalik sa Website</a>
+        <button class="btn btn-sm" style="background:rgba(255,255,255,0.15); color:white;" onclick="logout()">Lumabas</button>
+      </div>
+    </nav>
+
+    <div class="admin-content">
+      <div class="admin-tabs">
+        <button class="tab-btn active" onclick="switchTab('announcements')">📢 Mga Anunsyo</button>
+        <button class="tab-btn" onclick="switchTab('faqs')">❓ FAQs</button>
+        <button class="tab-btn" onclick="switchTab('video')">🎥 Video</button>
+        <button class="tab-btn" onclick="switchTab('export')">💾 I-Export / I-Import</button>
+      </div>
+
+      <!-- ANNOUNCEMENTS TAB -->
+      <div class="tab-panel active" id="tab-announcements">
+        <div class="card">
+          <h3>➕ Bagong Anunsyo</h3>
+          <div class="field">
+            <label>Pamagat</label>
+            <input type="text" id="ann-title" placeholder="Halimbawa: Enrollment Open na para sa SY 2026-2027" />
+          </div>
+          <div class="field">
+            <label>Nilalaman</label>
+            <textarea id="ann-body" placeholder="Ilagay ang detalye ng anunsyo..."></textarea>
+          </div>
+          <div class="field">
+            <label>Badge / Label</label>
+            <input type="text" id="ann-badge" placeholder="Halimbawa: Bagong Balita, Kaganapan, Mahalagang Paalala" />
+          </div>
+          <button class="btn btn-gold" onclick="addAnnouncement()">➕ Idagdag ang Anunsyo</button>
+        </div>
+
+        <div class="card">
+          <h3>📋 Mga Kasalukuyang Anunsyo</h3>
+          <div class="item-list" id="ann-list">
+            <div class="empty-state">Walang anunsyo pa.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- FAQs TAB -->
+      <div class="tab-panel" id="tab-faqs">
+        <div class="card">
+          <h3>➕ Bagong FAQ</h3>
+          <div class="field">
+            <label>Tanong</label>
+            <input type="text" id="faq-q" placeholder="Halimbawa: Libre ba ang pag-aaral?" />
+          </div>
+          <div class="field">
+            <label>Sagot</label>
+            <textarea id="faq-a" placeholder="Ilagay ang sagot dito..."></textarea>
+          </div>
+          <button class="btn btn-green" onclick="addFAQ()">➕ Idagdag ang FAQ</button>
+        </div>
+
+        <div class="card">
+          <h3>📋 Mga Kasalukuyang FAQ</h3>
+          <div class="item-list" id="faq-list">
+            <div class="empty-state">Walang FAQ pa.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- VIDEO TAB -->
+      <div class="tab-panel" id="tab-video">
+        <div class="card">
+          <h3>🎥 Kasalukuyang Video sa Homepage</h3>
+          <div id="video-current-status">
+            <div class="empty-state">Wala pang video na naka-set. Magdagdag sa ibaba.</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>➕ Magdagdag / Palitan ng Video</h3>
+          <p style="font-size:0.85rem; color:var(--muted); margin-bottom:16px;">
+            I-paste ang link ng YouTube video (o YouTube Shorts). Ito ang lalabas sa homepage, sa ilalim ng "Kilalanin ang Aming Paaralan" section. Kung walang video na naka-set, ang buong section ay awtomatikong itatago sa homepage.
+          </p>
+          <div class="field">
+            <label>YouTube Video / Shorts Link</label>
+            <input type="text" id="video-url" placeholder="Halimbawa: https://youtu.be/dQw4w9WgXcQ" />
+          </div>
+          <div class="field">
+            <label>Maikling Deskripsyon</label>
+            <textarea id="video-description" placeholder="Halimbawa: Isang maikling sulyap sa buhay-paaralan..."></textarea>
+          </div>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <button class="btn btn-gold" onclick="saveVideo()">💾 I-Save ang Video</button>
+            <button class="btn btn-danger" onclick="removeVideo()">🗑️ Alisin ang Video</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- EXPORT TAB -->
+      <div class="tab-panel" id="tab-export">
+        <div class="card">
+          <h3>💾 I-Export ang Data</h3>
+          <p style="font-size:0.88rem; color:var(--muted); margin-bottom:16px;">
+            I-download ang kasalukuyang data.json file. I-paste ito sa inyong <code>website/data.json</code> para ma-update ang website.
+          </p>
+          <button class="btn btn-green" onclick="exportData()">⬇️ I-Download ang data.json</button>
+        </div>
+        <div class="card">
+          <h3>📂 I-Import ang Data</h3>
+          <p style="font-size:0.88rem; color:var(--muted); margin-bottom:16px;">
+            Mag-upload ng dating data.json file para ma-restore ang mga luma nang nilalaman.
+          </p>
+          <div class="field">
+            <label>Piliin ang data.json</label>
+            <input type="file" id="importFile" accept=".json" onchange="importData(event)" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+  <!-- ============================================================
+       SCRIPTS
+  ============================================================ -->
+  <script>
+    // ---- IMPORTANT: Change this password before going live ----
+    const ADMIN_PASSWORD = 'tctar2025';
+    // -----------------------------------------------------------
+
+    let data = { announcements: [], faqs: [], video: null };
+
+    // LOGIN
+    function login() {
+      const pw = document.getElementById('passwordInput').value;
+      if (pw === ADMIN_PASSWORD) {
+        document.getElementById('loginScreen').style.display = 'none';
+        document.getElementById('adminPanel').style.display = 'block';
+        loadData();
+      } else {
+        document.getElementById('loginError').style.display = 'block';
+      }
+    }
+
+    function logout() {
+      document.getElementById('loginScreen').style.display = 'flex';
+      document.getElementById('adminPanel').style.display = 'none';
+      document.getElementById('passwordInput').value = '';
+    }
+
+    // TABS
+    function switchTab(name) {
+      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById(`tab-${name}`).classList.add('active');
+      event.target.classList.add('active');
+    }
+
+    // LOAD DATA from data.json
+    async function loadData() {
+      try {
+        const res = await fetch('data.json?t=' + Date.now());
+        data = await res.json();
+        if (!('video' in data)) data.video = null; // older data.json files won't have this yet
+      } catch (e) {
+        data = { announcements: [], faqs: [], video: null };
+      }
+      renderAll();
+    }
+
+    function renderAll() {
+      renderAnnList();
+      renderFAQList();
+      renderVideoStatus();
+    }
+
+    // ANNOUNCEMENTS
+    function addAnnouncement() {
+      const title = document.getElementById('ann-title').value.trim();
+      const body  = document.getElementById('ann-body').value.trim();
+      const badge = document.getElementById('ann-badge').value.trim() || 'Anunsyo';
+      if (!title || !body) { showToast('Punan ang pamagat at nilalaman.'); return; }
+      const id = Date.now();
+      const date = new Date().toISOString().split('T')[0];
+      data.announcements.unshift({ id, title, body, date, badge });
+      document.getElementById('ann-title').value = '';
+      document.getElementById('ann-body').value = '';
+      document.getElementById('ann-badge').value = '';
+      renderAnnList();
+      showToast('✅ Naidagdag ang anunsyo!');
+    }
+
+    function deleteAnnouncement(id) {
+      if (!confirm('Tanggalin ang anunsyong ito?')) return;
+      data.announcements = data.announcements.filter(a => a.id !== id);
+      renderAnnList();
+      showToast('🗑️ Natanggal ang anunsyo.');
+    }
+
+    function renderAnnList() {
+      const list = document.getElementById('ann-list');
+      if (!data.announcements.length) {
+        list.innerHTML = '<div class="empty-state">Walang anunsyo pa. Magdagdag ng bago sa itaas.</div>';
+        return;
+      }
+      list.innerHTML = data.announcements.map(a => `
+        <div class="item-row">
+          <div class="item-content">
+            <strong>${a.title}</strong>
+            <p>${a.body}</p>
+            <p style="margin-top:6px; font-size:0.75rem; color:#999;">${a.badge} · ${a.date}</p>
+          </div>
+          <div class="item-actions">
+            <button class="btn btn-sm btn-danger" onclick="deleteAnnouncement(${a.id})">Tanggalin</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // FAQs
+    function addFAQ() {
+      const question = document.getElementById('faq-q').value.trim();
+      const answer   = document.getElementById('faq-a').value.trim();
+      if (!question || !answer) { showToast('Punan ang tanong at sagot.'); return; }
+      const id = Date.now();
+      data.faqs.push({ id, question, answer });
+      document.getElementById('faq-q').value = '';
+      document.getElementById('faq-a').value = '';
+      renderFAQList();
+      showToast('✅ Naidagdag ang FAQ!');
+    }
+
+    function deleteFAQ(id) {
+      if (!confirm('Tanggalin ang FAQ na ito?')) return;
+      data.faqs = data.faqs.filter(f => f.id !== id);
+      renderFAQList();
+      showToast('🗑️ Natanggal ang FAQ.');
+    }
+
+    function renderFAQList() {
+      const list = document.getElementById('faq-list');
+      if (!data.faqs.length) {
+        list.innerHTML = '<div class="empty-state">Walang FAQ pa. Magdagdag ng bago sa itaas.</div>';
+        return;
+      }
+      list.innerHTML = data.faqs.map(f => `
+        <div class="item-row">
+          <div class="item-content">
+            <strong>${f.question}</strong>
+            <p>${f.answer}</p>
+          </div>
+          <div class="item-actions">
+            <button class="btn btn-sm btn-danger" onclick="deleteFAQ(${f.id})">Tanggalin</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // VIDEO
+    // Supports standard YouTube links, youtu.be short links, Shorts, and embed links
+    function extractYouTubeId(url) {
+      if (!url) return null;
+      const patterns = [
+        /youtu\.be\/([a-zA-Z0-9_-]{11})/,
+        /youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})/,
+        /youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/,
+        /youtube\.com\/embed\/([a-zA-Z0-9_-]{11})/
+      ];
+      for (const p of patterns) {
+        const m = url.match(p);
+        if (m) return m[1];
+      }
+      return null;
+    }
+
+    function saveVideo() {
+      const url = document.getElementById('video-url').value.trim();
+      const description = document.getElementById('video-description').value.trim();
+
+      if (!url) { showToast('Ilagay muna ang YouTube link.'); return; }
+
+      const videoId = extractYouTubeId(url);
+      if (!videoId) {
+        showToast('❌ Hindi valid na YouTube link. Tignan at subukan muli.');
+        return;
+      }
+
+      data.video = { url, description };
+      renderVideoStatus();
+      showToast('✅ Na-save ang video! Huwag kalimutang i-download ang data.json sa "Export" tab.');
+    }
+
+    function removeVideo() {
+      if (!data.video) { showToast('Wala namang video na naka-set.'); return; }
+      if (!confirm('Alisin ang video sa homepage?')) return;
+      data.video = null;
+      document.getElementById('video-url').value = '';
+      document.getElementById('video-description').value = '';
+      renderVideoStatus();
+      showToast('🗑️ Naalis ang video. Itatago na ito sa homepage.');
+    }
+
+    function renderVideoStatus() {
+      const box = document.getElementById('video-current-status');
+      if (!data.video || !data.video.url) {
+        box.innerHTML = '<div class="empty-state">Wala pang video na naka-set. Magdagdag sa ibaba.</div>';
+        return;
+      }
+      const videoId = extractYouTubeId(data.video.url);
+      box.innerHTML = `
+        <div class="item-row">
+          <div class="item-content">
+            <strong>${videoId ? '✅ Aktibo sa homepage' : '⚠️ Naka-save pero invalid ang link'}</strong>
+            <p>${data.video.url}</p>
+            ${data.video.description ? `<p style="margin-top:6px;">${data.video.description}</p>` : ''}
+          </div>
+        </div>
+      `;
+      document.getElementById('video-url').value = data.video.url || '';
+      document.getElementById('video-description').value = data.video.description || '';
+    }
+
+    // EXPORT
+    function exportData() {
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'data.json';
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast('⬇️ Na-download ang data.json');
+    }
+
+    // IMPORT
+    function importData(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        try {
+          data = JSON.parse(e.target.result);
+          renderAll();
+          showToast('✅ Na-import ang data!');
+        } catch {
+          showToast('❌ Hindi valid ang JSON file.');
+        }
+      };
+      reader.readAsText(file);
+    }
+
+    // TOAST
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
+  </script>
+</body>
+</html>
