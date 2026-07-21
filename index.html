@@ -1050,77 +1050,72 @@ async function loadData() {
     ]);
     const announcements = await annRes.json();
     const video = await vidRes.json();
-    renderAnnouncements(announcements.slice(0, 2));
+    renderLatestAnnouncement(announcements[0] || null);
     renderVideo(video);
   } catch (e) {
     document.getElementById('announcementsGrid').innerHTML =
-      '<p class="no-content">Hindi ma-load ang mga anunsyo sa ngayon.</p>';
+      '<p class="no-content">Hindi ma-load ang balita sa ngayon.</p>';
   }
 }
 
-    // Supports standard YouTube links, youtu.be short links, Shorts, and embed links
-    function extractYouTubeId(url) {
-      if (!url) return null;
-      const patterns = [
-        /youtu\.be\/([a-zA-Z0-9_-]{11})/,
-        /youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})/,
-        /youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/,
-        /youtube\.com\/embed\/([a-zA-Z0-9_-]{11})/
-      ];
-      for (const p of patterns) {
-        const m = url.match(p);
-        if (m) return m[1];
-      }
-      return null;
-    }
+function extractYouTubeId(url) {
+  if (!url) return null;
+  const patterns = [
+    /youtu\.be\/([a-zA-Z0-9_-]{11})/,
+    /youtube\.com\/watch\?v=([a-zA-Z0-9_-]{11})/,
+    /youtube\.com\/shorts\/([a-zA-Z0-9_-]{11})/,
+    /youtube\.com\/embed\/([a-zA-Z0-9_-]{11})/
+  ];
+  for (const p of patterns) {
+    const m = url.match(p);
+    if (m) return m[1];
+  }
+  return null;
+}
 
-    function renderVideo(video) {
-      const section = document.getElementById('video-highlight');
-      const wrapper = document.getElementById('videoEmbedWrapper');
-      const desc = document.getElementById('videoDescription');
+function renderVideo(video) {
+  const section = document.getElementById('video-highlight');
+  const wrapper = document.getElementById('videoEmbedWrapper');
+  const desc = document.getElementById('videoDescription');
+  const videoId = video && video.url ? extractYouTubeId(video.url) : null;
+  if (!videoId) { section.style.display = 'none'; return; }
+  desc.textContent = video.description || '';
+  wrapper.innerHTML = `
+    <iframe
+      src="https://www.youtube-nocookie.com/embed/${videoId}"
+      title="School Video"
+      loading="lazy"
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+      allowfullscreen>
+    </iframe>
+  `;
+  section.style.display = 'block';
+}
 
-      const videoId = video && video.url ? extractYouTubeId(video.url) : null;
+function renderLatestAnnouncement(a) {
+  const grid = document.getElementById('announcementsGrid');
+  if (!a) {
+    grid.innerHTML = '<p class="no-content">Walang balita sa ngayon.</p>';
+    return;
+  }
+  const excerpt = a.body.length > 120 ? a.body.substring(0, 120) + '...' : a.body;
+  grid.innerHTML = `
+    <div class="announcement-card" style="cursor:pointer;" onclick="window.location='announcements.html'">
+      <span class="badge badge-gold">${a.badge}</span>
+      <h3>${a.title}</h3>
+      <p>${excerpt}</p>
+      <p class="announcement-date">${formatDate(a.date)}</p>
+      <p style="margin-top:12px; color:var(--green-mid); font-size:0.82rem; font-weight:600;">Basahin ang buong balita →</p>
+    </div>
+  `;
+}
 
-      if (!videoId) {
-        section.style.display = 'none';
-        return;
-      }
+function formatDate(dateStr) {
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('fil-PH', { year: 'numeric', month: 'long', day: 'numeric' });
+}
 
-      desc.textContent = video.description || '';
-      wrapper.innerHTML = `
-        <iframe
-          src="https://www.youtube-nocookie.com/embed/${videoId}"
-          title="School Video"
-          loading="lazy"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowfullscreen>
-        </iframe>
-      `;
-      section.style.display = 'block';
-    }
-
-    function renderAnnouncements(announcements) {
-      const grid = document.getElementById('announcementsGrid');
-      if (!announcements || announcements.length === 0) {
-        grid.innerHTML = '<p class="no-content">Walang anunsyo sa ngayon.</p>';
-        return;
-      }
-      grid.innerHTML = announcements.map(a => `
-        <div class="announcement-card">
-          <span class="badge badge-gold">${a.badge}</span>
-          <h3>${a.title}</h3>
-          <p>${a.body}</p>
-          <p class="announcement-date">${formatDate(a.date)}</p>
-        </div>
-      `).join('');
-    }
-
-    function formatDate(dateStr) {
-      const d = new Date(dateStr);
-      return d.toLocaleDateString('fil-PH', { year: 'numeric', month: 'long', day: 'numeric' });
-    }
-
-    loadData();
+loadData();
   </script>
   <script src="chatbot.js"></script>
 </body>
