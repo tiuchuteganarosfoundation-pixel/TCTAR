@@ -363,10 +363,10 @@
   let isOpen = false;
 
   // Load FAQs from data.json to augment built-in knowledge
-  fetch('data.json')
-    .then(r => r.json())
-    .then(d => { faqData = d.faqs || []; })
-    .catch(() => { faqData = []; });
+  fetch('https://tctar-api.onrender.com/website/faqs')
+  .then(r => r.json())
+  .then(d => { faqData = Array.isArray(d) ? d : []; })
+  .catch(() => { faqData = []; });
 
   function match(input) {
     const lower = input.toLowerCase().trim();

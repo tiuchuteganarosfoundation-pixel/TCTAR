@@ -395,9 +395,7 @@
   <script>
     // ---- IMPORTANT: Change this password before going live ----
     const ADMIN_PASSWORD = 'tctar2025';
-    // -----------------------------------------------------------
-
-    let data = { announcements: [], faqs: [], video: null };
+    const API = 'https://tctar-api.onrender.com';
 
     // LOGIN
     function login() {
@@ -405,7 +403,7 @@
       if (pw === ADMIN_PASSWORD) {
         document.getElementById('loginScreen').style.display = 'none';
         document.getElementById('adminPanel').style.display = 'block';
-        loadData();
+        loadAll();
       } else {
         document.getElementById('loginError').style.display = 'block';
       }
@@ -425,54 +423,67 @@
       event.target.classList.add('active');
     }
 
-    // LOAD DATA from data.json
-    async function loadData() {
-      try {
-        const res = await fetch('data.json?t=' + Date.now());
-        data = await res.json();
-        if (!('video' in data)) data.video = null; // older data.json files won't have this yet
-      } catch (e) {
-        data = { announcements: [], faqs: [], video: null };
-      }
-      renderAll();
+    // LOAD ALL DATA FROM API
+    async function loadAll() {
+      await Promise.all([loadAnnouncements(), loadFAQs(), loadVideo()]);
     }
 
-    function renderAll() {
-      renderAnnList();
-      renderFAQList();
-      renderVideoStatus();
-    }
-
+    // ============================================================
     // ANNOUNCEMENTS
-    function addAnnouncement() {
+    // ============================================================
+    let announcements = [];
+
+    async function loadAnnouncements() {
+      try {
+        const res = await fetch(`${API}/website/announcements`);
+        announcements = await res.json();
+        renderAnnList();
+      } catch (e) {
+        showToast('❌ Hindi ma-load ang mga anunsyo.');
+      }
+    }
+
+    async function addAnnouncement() {
       const title = document.getElementById('ann-title').value.trim();
       const body  = document.getElementById('ann-body').value.trim();
       const badge = document.getElementById('ann-badge').value.trim() || 'Anunsyo';
       if (!title || !body) { showToast('Punan ang pamagat at nilalaman.'); return; }
-      const id = Date.now();
-      const date = new Date().toISOString().split('T')[0];
-      data.announcements.unshift({ id, title, body, date, badge });
-      document.getElementById('ann-title').value = '';
-      document.getElementById('ann-body').value = '';
-      document.getElementById('ann-badge').value = '';
-      renderAnnList();
-      showToast('✅ Naidagdag ang anunsyo!');
+
+      try {
+        const res = await fetch(`${API}/website/announcements`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title, body, badge })
+        });
+        if (!res.ok) throw new Error();
+        document.getElementById('ann-title').value = '';
+        document.getElementById('ann-body').value = '';
+        document.getElementById('ann-badge').value = '';
+        showToast('✅ Naidagdag ang anunsyo!');
+        await loadAnnouncements();
+      } catch (e) {
+        showToast('❌ Hindi na-save ang anunsyo. Subukan muli.');
+      }
     }
 
-    function deleteAnnouncement(id) {
+    async function deleteAnnouncement(id) {
       if (!confirm('Tanggalin ang anunsyong ito?')) return;
-      data.announcements = data.announcements.filter(a => a.id !== id);
-      renderAnnList();
-      showToast('🗑️ Natanggal ang anunsyo.');
+      try {
+        await fetch(`${API}/website/announcements/${id}`, { method: 'DELETE' });
+        showToast('🗑️ Natanggal ang anunsyo.');
+        await loadAnnouncements();
+      } catch (e) {
+        showToast('❌ Hindi natanggal. Subukan muli.');
+      }
     }
 
     function renderAnnList() {
       const list = document.getElementById('ann-list');
-      if (!data.announcements.length) {
+      if (!announcements.length) {
         list.innerHTML = '<div class="empty-state">Walang anunsyo pa. Magdagdag ng bago sa itaas.</div>';
         return;
       }
-      list.innerHTML = data.announcements.map(a => `
+      list.innerHTML = announcements.map(a => `
         <div class="item-row">
           <div class="item-content">
             <strong>${a.title}</strong>
@@ -486,33 +497,60 @@
       `).join('');
     }
 
+    // ============================================================
     // FAQs
-    function addFAQ() {
+    // ============================================================
+    let faqs = [];
+
+    async function loadFAQs() {
+      try {
+        const res = await fetch(`${API}/website/faqs`);
+        faqs = await res.json();
+        renderFAQList();
+      } catch (e) {
+        showToast('❌ Hindi ma-load ang mga FAQ.');
+      }
+    }
+
+    async function addFAQ() {
       const question = document.getElementById('faq-q').value.trim();
       const answer   = document.getElementById('faq-a').value.trim();
       if (!question || !answer) { showToast('Punan ang tanong at sagot.'); return; }
-      const id = Date.now();
-      data.faqs.push({ id, question, answer });
-      document.getElementById('faq-q').value = '';
-      document.getElementById('faq-a').value = '';
-      renderFAQList();
-      showToast('✅ Naidagdag ang FAQ!');
+
+      try {
+        const res = await fetch(`${API}/website/faqs`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ question, answer })
+        });
+        if (!res.ok) throw new Error();
+        document.getElementById('faq-q').value = '';
+        document.getElementById('faq-a').value = '';
+        showToast('✅ Naidagdag ang FAQ!');
+        await loadFAQs();
+      } catch (e) {
+        showToast('❌ Hindi na-save ang FAQ. Subukan muli.');
+      }
     }
 
-    function deleteFAQ(id) {
+    async function deleteFAQ(id) {
       if (!confirm('Tanggalin ang FAQ na ito?')) return;
-      data.faqs = data.faqs.filter(f => f.id !== id);
-      renderFAQList();
-      showToast('🗑️ Natanggal ang FAQ.');
+      try {
+        await fetch(`${API}/website/faqs/${id}`, { method: 'DELETE' });
+        showToast('🗑️ Natanggal ang FAQ.');
+        await loadFAQs();
+      } catch (e) {
+        showToast('❌ Hindi natanggal. Subukan muli.');
+      }
     }
 
     function renderFAQList() {
       const list = document.getElementById('faq-list');
-      if (!data.faqs.length) {
+      if (!faqs.length) {
         list.innerHTML = '<div class="empty-state">Walang FAQ pa. Magdagdag ng bago sa itaas.</div>';
         return;
       }
-      list.innerHTML = data.faqs.map(f => `
+      list.innerHTML = faqs.map(f => `
         <div class="item-row">
           <div class="item-content">
             <strong>${f.question}</strong>
@@ -525,8 +563,9 @@
       `).join('');
     }
 
+    // ============================================================
     // VIDEO
-    // Supports standard YouTube links, youtu.be short links, Shorts, and embed links
+    // ============================================================
     function extractYouTubeId(url) {
       if (!url) return null;
       const patterns = [
@@ -542,80 +581,78 @@
       return null;
     }
 
-    function saveVideo() {
+    async function loadVideo() {
+      try {
+        const res = await fetch(`${API}/website/video`);
+        const video = await res.json();
+        renderVideoStatus(video);
+      } catch (e) {
+        showToast('❌ Hindi ma-load ang video.');
+      }
+    }
+
+    async function saveVideo() {
       const url = document.getElementById('video-url').value.trim();
       const description = document.getElementById('video-description').value.trim();
-
       if (!url) { showToast('Ilagay muna ang YouTube link.'); return; }
+      if (!extractYouTubeId(url)) { showToast('❌ Hindi valid na YouTube link.'); return; }
 
-      const videoId = extractYouTubeId(url);
-      if (!videoId) {
-        showToast('❌ Hindi valid na YouTube link. Tignan at subukan muli.');
-        return;
+      try {
+        const res = await fetch(`${API}/website/video`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url, description })
+        });
+        if (!res.ok) throw new Error();
+        showToast('✅ Na-save ang video!');
+        await loadVideo();
+      } catch (e) {
+        showToast('❌ Hindi na-save ang video. Subukan muli.');
       }
-
-      data.video = { url, description };
-      renderVideoStatus();
-      showToast('✅ Na-save ang video! Huwag kalimutang i-download ang data.json sa "Export" tab.');
     }
 
-    function removeVideo() {
-      if (!data.video) { showToast('Wala namang video na naka-set.'); return; }
+    async function removeVideo() {
       if (!confirm('Alisin ang video sa homepage?')) return;
-      data.video = null;
-      document.getElementById('video-url').value = '';
-      document.getElementById('video-description').value = '';
-      renderVideoStatus();
-      showToast('🗑️ Naalis ang video. Itatago na ito sa homepage.');
+      try {
+        await fetch(`${API}/website/video`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ url: null, description: null })
+        });
+        document.getElementById('video-url').value = '';
+        document.getElementById('video-description').value = '';
+        showToast('🗑️ Naalis ang video.');
+        await loadVideo();
+      } catch (e) {
+        showToast('❌ Hindi naalis. Subukan muli.');
+      }
     }
 
-    function renderVideoStatus() {
+    function renderVideoStatus(video) {
       const box = document.getElementById('video-current-status');
-      if (!data.video || !data.video.url) {
+      if (!video || !video.url) {
         box.innerHTML = '<div class="empty-state">Wala pang video na naka-set. Magdagdag sa ibaba.</div>';
         return;
       }
-      const videoId = extractYouTubeId(data.video.url);
+      const videoId = extractYouTubeId(video.url);
       box.innerHTML = `
         <div class="item-row">
           <div class="item-content">
-            <strong>${videoId ? '✅ Aktibo sa homepage' : '⚠️ Naka-save pero invalid ang link'}</strong>
-            <p>${data.video.url}</p>
-            ${data.video.description ? `<p style="margin-top:6px;">${data.video.description}</p>` : ''}
+            <strong>${videoId ? '✅ Aktibo sa homepage' : '⚠️ Invalid ang link'}</strong>
+            <p>${video.url}</p>
+            ${video.description ? `<p style="margin-top:6px;">${video.description}</p>` : ''}
           </div>
         </div>
       `;
-      document.getElementById('video-url').value = data.video.url || '';
-      document.getElementById('video-description').value = data.video.description || '';
+      document.getElementById('video-url').value = video.url || '';
+      document.getElementById('video-description').value = video.description || '';
     }
 
-    // EXPORT
+    // ============================================================
+    // EXPORT TAB — now just informational since API handles saving
+    // ============================================================
     function exportData() {
-      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'data.json';
-      a.click();
-      URL.revokeObjectURL(url);
-      showToast('⬇️ Na-download ang data.json');
-    }
-
-    // IMPORT
-    function importData(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-      const reader = new FileReader();
-      reader.onload = e => {
-        try {
-          data = JSON.parse(e.target.result);
-          renderAll();
-          showToast('✅ Na-import ang data!');
-        } catch {
-          showToast('❌ Hindi valid ang JSON file.');
-        }
-      };
-      reader.readAsText(file);
+      showToast('ℹ️ Hindi na kailangan ng export. Ang lahat ng data ay naka-save sa database.');
     }
 
     // TOAST

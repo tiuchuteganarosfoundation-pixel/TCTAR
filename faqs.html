@@ -908,42 +908,44 @@ function initSite(activePage) {
   <script>
     initSite('faqs');
 
-    async function loadData() {
-      try {
-        const res = await fetch('data.json');
-        const data = await res.json();
-        renderFAQs(data.faqs);
-      } catch (e) {
-        document.getElementById('faqList').innerHTML =
-          '<p class="no-content" style="text-align:center;">Hindi ma-load ang mga FAQ sa ngayon.</p>';
-      }
-    }
+const API = 'https://tctar-api.onrender.com';
 
-    function renderFAQs(faqs) {
-      const list = document.getElementById('faqList');
-      if (!faqs || faqs.length === 0) {
-        list.innerHTML = '<p class="no-content" style="text-align:center;">Walang FAQ sa ngayon.</p>';
-        return;
-      }
-      list.innerHTML = faqs.map((f, i) => `
-        <div class="faq-item" id="faq-${i}">
-          <button class="faq-question" onclick="toggleFAQ(${i})" aria-expanded="false">
-            <span>${f.question}</span>
-            <span class="faq-chevron">▾</span>
-          </button>
-          <div class="faq-answer">${f.answer}</div>
-        </div>
-      `).join('');
-    }
+async function loadData() {
+  try {
+    const res = await fetch(`${API}/website/faqs`);
+    const faqs = await res.json();
+    renderFAQs(faqs);
+  } catch (e) {
+    document.getElementById('faqList').innerHTML =
+      '<p class="no-content" style="text-align:center;">Hindi ma-load ang mga FAQ sa ngayon.</p>';
+  }
+}
 
-    function toggleFAQ(index) {
-      const item = document.getElementById(`faq-${index}`);
-      const isOpen = item.classList.contains('open');
-      document.querySelectorAll('.faq-item').forEach(el => el.classList.remove('open'));
-      if (!isOpen) item.classList.add('open');
-    }
+function renderFAQs(faqs) {
+  const list = document.getElementById('faqList');
+  if (!faqs || faqs.length === 0) {
+    list.innerHTML = '<p class="no-content" style="text-align:center;">Walang FAQ sa ngayon.</p>';
+    return;
+  }
+  list.innerHTML = faqs.map((f, i) => `
+    <div class="faq-item" id="faq-${i}">
+      <button class="faq-question" onclick="toggleFAQ(${i})" aria-expanded="false">
+        <span>${f.question}</span>
+        <span class="faq-chevron">▾</span>
+      </button>
+      <div class="faq-answer">${f.answer}</div>
+    </div>
+  `).join('');
+}
 
-    loadData();
+function toggleFAQ(index) {
+  const item = document.getElementById(`faq-${index}`);
+  const isOpen = item.classList.contains('open');
+  document.querySelectorAll('.faq-item').forEach(el => el.classList.remove('open'));
+  if (!isOpen) item.classList.add('open');
+}
+
+loadData();
   </script>
   <script src="chatbot.js"></script>
 </body>

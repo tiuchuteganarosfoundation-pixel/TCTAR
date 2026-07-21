@@ -1040,17 +1040,23 @@ function initSite(activePage) {
     initSite('home');
 
     // --- Load data.json and render latest 2 announcements + video ---
-    async function loadData() {
-      try {
-        const res = await fetch('data.json');
-        const data = await res.json();
-        renderAnnouncements((data.announcements || []).slice(0, 2));
-        renderVideo(data.video || null);
-      } catch (e) {
-        document.getElementById('announcementsGrid').innerHTML =
-          '<p class="no-content">Hindi ma-load ang mga anunsyo sa ngayon.</p>';
-      }
-    }
+    const API = 'https://tctar-api.onrender.com';
+
+async function loadData() {
+  try {
+    const [annRes, vidRes] = await Promise.all([
+      fetch(`${API}/website/announcements`),
+      fetch(`${API}/website/video`)
+    ]);
+    const announcements = await annRes.json();
+    const video = await vidRes.json();
+    renderAnnouncements(announcements.slice(0, 2));
+    renderVideo(video);
+  } catch (e) {
+    document.getElementById('announcementsGrid').innerHTML =
+      '<p class="no-content">Hindi ma-load ang mga anunsyo sa ngayon.</p>';
+  }
+}
 
     // Supports standard YouTube links, youtu.be short links, Shorts, and embed links
     function extractYouTubeId(url) {

@@ -908,39 +908,41 @@ function initSite(activePage) {
   <script>
     initSite('announcements');
 
-    async function loadData() {
-      try {
-        const res = await fetch('data.json');
-        const data = await res.json();
-        renderAnnouncements(data.announcements);
-      } catch (e) {
-        document.getElementById('announcementsGrid').innerHTML =
-          '<p class="no-content">Hindi ma-load ang mga anunsyo sa ngayon.</p>';
-      }
-    }
+const API = 'https://tctar-api.onrender.com';
 
-    function renderAnnouncements(announcements) {
-      const grid = document.getElementById('announcementsGrid');
-      if (!announcements || announcements.length === 0) {
-        grid.innerHTML = '<p class="no-content">Walang anunsyo sa ngayon.</p>';
-        return;
-      }
-      grid.innerHTML = announcements.map(a => `
-        <div class="announcement-card">
-          <span class="badge badge-gold">${a.badge}</span>
-          <h3>${a.title}</h3>
-          <p>${a.body}</p>
-          <p class="announcement-date">${formatDate(a.date)}</p>
-        </div>
-      `).join('');
-    }
+async function loadData() {
+  try {
+    const res = await fetch(`${API}/website/announcements`);
+    const announcements = await res.json();
+    renderAnnouncements(announcements);
+  } catch (e) {
+    document.getElementById('announcementsGrid').innerHTML =
+      '<p class="no-content">Hindi ma-load ang mga anunsyo sa ngayon.</p>';
+  }
+}
 
-    function formatDate(dateStr) {
-      const d = new Date(dateStr);
-      return d.toLocaleDateString('fil-PH', { year: 'numeric', month: 'long', day: 'numeric' });
-    }
+function renderAnnouncements(announcements) {
+  const grid = document.getElementById('announcementsGrid');
+  if (!announcements || announcements.length === 0) {
+    grid.innerHTML = '<p class="no-content">Walang anunsyo sa ngayon.</p>';
+    return;
+  }
+  grid.innerHTML = announcements.map(a => `
+    <div class="announcement-card">
+      <span class="badge badge-gold">${a.badge}</span>
+      <h3>${a.title}</h3>
+      <p>${a.body}</p>
+      <p class="announcement-date">${formatDate(a.date)}</p>
+    </div>
+  `).join('');
+}
 
-    loadData();
+function formatDate(dateStr) {
+  const d = new Date(dateStr);
+  return d.toLocaleDateString('fil-PH', { year: 'numeric', month: 'long', day: 'numeric' });
+}
+
+loadData();
   </script>
 </body>
 </html>
