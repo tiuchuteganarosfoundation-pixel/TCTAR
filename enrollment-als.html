@@ -1585,7 +1585,43 @@ function initSite(activePage) {
       document.getElementById('summaryBox').textContent = lastSummary;
       document.getElementById('formSuccess').classList.add('show');
       document.getElementById('formSuccess').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+      submitApplicationToRegistrar({
+        application_type: 'als',
+        first_name: v('firstName'),
+        last_name: v('lastName'),
+        email: v('contactEmail') || null,
+        phone_number: v('contactNumber') || null,
+        grade_level: v('literacyLevel') || 'ALS Applicant',
+        requirement_ids_declared: [
+          document.getElementById('req1')?.checked ? 1 : null,
+          document.getElementById('req4')?.checked ? 4 : null,
+          document.getElementById('req5')?.checked ? 5 : null,
+        ].filter(x => x !== null)
+      });
     });
+
+    async function submitApplicationToRegistrar(payload) {
+      const API = 'https://tctar-api.onrender.com';
+      try {
+        const res = await fetch(`${API}/applications`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) throw new Error('Submission failed');
+        console.log('Application submitted to registrar system successfully.');
+      } catch (e) {
+        console.error('Failed to submit application to registrar system:', e);
+        const successBox = document.getElementById('formSuccess');
+        const warn = document.createElement('p');
+        warn.style.color = '#B00020';
+        warn.style.marginTop = '12px';
+        warn.style.fontWeight = '600';
+        warn.textContent = '⚠️ Nagkaproblema sa pag-save ng inyong application sa aming sistema. Mangyaring i-email o kopyahin ang buod sa ibaba at ipadala nang direkta sa amin.';
+        successBox.appendChild(warn);
+      }
+    }
 
     function sendViaEmail() {
       const learnerName = `${document.getElementById('firstName').value} ${document.getElementById('lastName').value}`.trim();
