@@ -63,9 +63,6 @@ h1, h2, h3 { font-family: 'Playfair Display', serif; line-height: 1.25; }
 
 /* ============================================================
    NAVIGATION
-   Full-width bar: logo pinned to the far left, links pinned to
-   the far right edge of the viewport (no centered max-width
-   wrapper around nav-inner).
 ============================================================ */
 nav {
   background: var(--green-dark);
@@ -142,7 +139,7 @@ nav {
 }
 
 /* ============================================================
-   HERO SECTION (home page)
+   HERO SECTION
 ============================================================ */
 #hero {
   position: relative;
@@ -260,31 +257,6 @@ nav {
 .btn-outline:hover { border-color: var(--white); }
 
 /* ============================================================
-   PAGE HERO (banner used on inner pages: announcements, about,
-   faqs, enrollment)
-============================================================ */
-.page-hero {
-  background: var(--green-dark);
-  padding: 56px 24px;
-  text-align: center;
-}
-
-.page-hero .section-label { color: var(--gold); }
-
-.page-hero h1 {
-  font-size: clamp(1.6rem, 3.4vw, 2.4rem);
-  color: var(--white);
-  margin-bottom: 8px;
-}
-
-.page-hero p {
-  color: rgba(255,255,255,0.7);
-  font-size: 0.95rem;
-  max-width: 620px;
-  margin: 0 auto;
-}
-
-/* ============================================================
    STATS STRIP
 ============================================================ */
 #stats {
@@ -316,11 +288,141 @@ nav {
 }
 
 /* ============================================================
+   PRINCIPAL WELCOME SECTION
+============================================================ */
+#principal-welcome {
+  padding: 72px 0;
+  background: var(--white);
+}
+
+.principal-grid {
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr;
+  gap: 48px;
+  align-items: center;
+}
+
+@media (max-width: 720px) {
+  .principal-grid { grid-template-columns: 1fr; gap: 32px; }
+}
+
+.principal-photo-wrap {
+  text-align: center;
+}
+
+.principal-photo {
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  margin: 0 auto 16px;
+  background: var(--green-dark);
+  color: var(--white);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Playfair Display', serif;
+  font-size: 3rem;
+  font-weight: 700;
+  border: 5px solid var(--green-light);
+  box-shadow: var(--shadow);
+}
+
+.principal-name {
+  font-weight: 600;
+  color: var(--green-dark);
+  font-size: 1rem;
+}
+
+.principal-role {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.principal-quote {
+  position: relative;
+  padding-left: 24px;
+  border-left: 4px solid var(--green-mid);
+}
+
+.principal-quote p {
+  color: var(--text-muted);
+  font-size: 0.98rem;
+  margin-bottom: 14px;
+}
+
+.principal-quote p:last-of-type { margin-bottom: 0; }
+
+.principal-signoff {
+  margin-top: 18px;
+  font-family: 'Playfair Display', serif;
+  color: var(--green-dark);
+  font-size: 1.05rem;
+}
+
+/* ============================================================
+   SCHOOL HISTORY SECTION
+============================================================ */
+#school-history {
+  padding: 72px 0;
+  background: var(--cream);
+}
+
+.history-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 48px;
+  align-items: start;
+}
+
+@media (max-width: 720px) {
+  .history-grid { grid-template-columns: 1fr; gap: 28px; }
+}
+
+.history-text p {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  margin-bottom: 16px;
+}
+
+.history-milestones {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.milestone-item {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+  background: var(--white);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  box-shadow: var(--shadow);
+}
+
+.milestone-icon {
+  font-size: 1.3rem;
+  flex-shrink: 0;
+}
+
+.milestone-item h4 {
+  font-size: 0.9rem;
+  color: var(--green-dark);
+  margin-bottom: 3px;
+}
+
+.milestone-item p {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+/* ============================================================
    VIDEO HIGHLIGHT SECTION
 ============================================================ */
 #video-highlight {
   padding: 72px 0;
-  background: var(--cream);
+  background: var(--white);
 }
 
 .video-highlight-header {
@@ -343,7 +445,7 @@ nav {
 .video-embed-wrapper::before {
   content: "";
   display: block;
-  padding-top: 56.25%; /* 16:9 aspect ratio */
+  padding-top: 56.25%;
 }
 
 .video-embed-wrapper iframe {
@@ -359,6 +461,7 @@ nav {
 ============================================================ */
 #announcements {
   padding: 72px 0;
+  background: var(--bg);
 }
 
 .announcements-header {
@@ -425,174 +528,86 @@ nav {
 }
 
 /* ============================================================
-   ABOUT SECTION
+   TESTIMONIALS SECTION
 ============================================================ */
-#about {
-  background: var(--cream);
+#testimonials {
   padding: 72px 0;
+  background: var(--white);
 }
 
-.about-grid {
+.testimonials-header {
+  text-align: center;
+  max-width: 640px;
+  margin: 0 auto 40px;
+}
+
+.testimonials-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 64px;
-  align-items: center;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
 }
 
-@media (max-width: 720px) {
-  .about-grid { grid-template-columns: 1fr; gap: 36px; }
-}
-
-.about-text p {
-  color: var(--text-muted);
-  margin-bottom: 16px;
-  font-size: 0.95rem;
-}
-
-.about-highlights {
+.testimonial-card {
+  background: var(--bg);
+  border-radius: var(--radius);
+  padding: 28px;
+  box-shadow: var(--shadow);
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  margin-top: 28px;
-}
-
-.highlight-item {
-  display: flex;
-  align-items: flex-start;
   gap: 14px;
 }
 
-.highlight-icon {
-  width: 40px;
-  height: 40px;
-  background: var(--green-light);
-  border-radius: 10px;
+.testimonial-stars {
+  color: var(--gold);
+  font-size: 0.9rem;
+  letter-spacing: 2px;
+}
+
+.testimonial-text {
+  font-size: 0.9rem;
+  color: var(--text);
+  line-height: 1.65;
+  flex-grow: 1;
+}
+
+.testimonial-person {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 4px;
+}
+
+.testimonial-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--green-mid);
+  color: var(--white);
   display: flex;
   align-items: center;
   justify-content: center;
+  font-weight: 700;
+  font-size: 0.85rem;
   flex-shrink: 0;
-  font-size: 1.2rem;
 }
 
-.highlight-item h4 {
-  font-size: 0.9rem;
+.testimonial-name {
+  font-size: 0.85rem;
   font-weight: 600;
   color: var(--green-dark);
-  margin-bottom: 2px;
 }
 
-.highlight-item p {
-  font-size: 0.82rem;
+.testimonial-role {
+  font-size: 0.75rem;
   color: var(--text-muted);
-  margin: 0;
 }
 
-.about-visual {
-  background: var(--green-dark);
-  border-radius: 16px;
-  padding: 40px 32px;
+.testimonial-disclaimer {
   text-align: center;
-  color: var(--white);
-}
-
-.about-visual img {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  object-fit: cover;
-  margin: 0 auto 20px;
-  border: 3px solid var(--green-mid);
-}
-
-.about-visual h3 {
-  font-size: 1.3rem;
-  margin-bottom: 8px;
-}
-
-.about-visual p {
-  font-size: 0.85rem;
-  color: rgba(255,255,255,0.7);
-  margin-bottom: 24px;
-}
-
-.contact-info {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  text-align: left;
-}
-
-.contact-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 0.85rem;
-  color: rgba(255,255,255,0.85);
-}
-
-.contact-icon { font-size: 1rem; }
-
-/* ============================================================
-   FAQ SECTION
-============================================================ */
-#faqs {
-  padding: 72px 0;
-}
-
-.faq-list {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  max-width: 780px;
-  margin: 36px auto 0;
-}
-
-.faq-item {
-  background: var(--white);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  overflow: hidden;
-}
-
-.faq-question {
-  width: 100%;
-  background: none;
-  border: none;
-  padding: 20px 24px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  cursor: pointer;
-  text-align: left;
-  font-family: 'Inter', sans-serif;
-  font-size: 0.95rem;
-  font-weight: 600;
-  color: var(--green-dark);
-  gap: 16px;
-}
-
-.faq-question:hover { background: var(--bg); }
-
-.faq-chevron {
-  font-size: 1.1rem;
-  transition: transform 0.25s;
-  flex-shrink: 0;
-}
-
-.faq-item.open .faq-chevron { transform: rotate(180deg); }
-
-.faq-answer {
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.3s ease, padding 0.3s;
-  padding: 0 24px;
-  font-size: 0.9rem;
+  font-size: 0.75rem;
   color: var(--text-muted);
-}
-
-.faq-item.open .faq-answer {
-  max-height: 300px;
-  padding: 0 24px 20px;
+  font-style: italic;
+  margin-top: 28px;
 }
 
 /* ============================================================
@@ -615,156 +630,6 @@ nav {
   margin-bottom: 32px;
   font-size: 0.95rem;
 }
-
-/* ============================================================
-   ENROLLMENT FORM PAGE
-============================================================ */
-#enroll-form-section {
-  padding: 72px 0;
-}
-
-.enroll-grid {
-  display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
-  gap: 48px;
-  align-items: start;
-}
-
-@media (max-width: 800px) {
-  .enroll-grid { grid-template-columns: 1fr; gap: 36px; }
-}
-
-.enroll-form {
-  background: var(--white);
-  border-radius: var(--radius);
-  box-shadow: var(--shadow);
-  padding: 32px;
-}
-
-.enroll-form h3 {
-  color: var(--green-dark);
-  font-size: 1.1rem;
-  margin-bottom: 20px;
-}
-
-.form-row {
-  margin-bottom: 18px;
-}
-
-.form-row label {
-  display: block;
-  font-size: 0.82rem;
-  font-weight: 600;
-  color: var(--green-dark);
-  margin-bottom: 6px;
-}
-
-.form-row input,
-.form-row select,
-.form-row textarea {
-  width: 100%;
-  padding: 11px 14px;
-  border: 1.5px solid #D0E4D8;
-  border-radius: var(--radius);
-  font-family: 'Inter', sans-serif;
-  font-size: 0.9rem;
-  color: var(--text);
-  background: var(--white);
-  outline: none;
-  transition: border-color 0.2s;
-}
-
-.form-row input:focus,
-.form-row select:focus,
-.form-row textarea:focus {
-  border-color: var(--green-mid);
-}
-
-.form-row-split {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
-}
-
-@media (max-width: 480px) {
-  .form-row-split { grid-template-columns: 1fr; }
-}
-
-.form-note {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  margin-top: 4px;
-}
-
-.enroll-steps {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.enroll-step {
-  display: flex;
-  gap: 16px;
-  align-items: flex-start;
-}
-
-.enroll-step-num {
-  flex-shrink: 0;
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: var(--green-light);
-  color: var(--green-dark);
-  font-family: 'Playfair Display', serif;
-  font-weight: 700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.enroll-step h4 {
-  font-size: 0.92rem;
-  color: var(--green-dark);
-  margin-bottom: 4px;
-}
-
-.enroll-step p {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-}
-
-.enroll-docs {
-  background: var(--cream);
-  border-radius: var(--radius);
-  padding: 24px;
-  margin-top: 28px;
-}
-
-.enroll-docs h4 {
-  color: var(--green-dark);
-  font-size: 0.95rem;
-  margin-bottom: 10px;
-}
-
-.enroll-docs ul {
-  padding-left: 20px;
-  color: var(--text-muted);
-  font-size: 0.86rem;
-}
-
-.enroll-docs li { margin-bottom: 4px; }
-
-.form-success {
-  display: none;
-  background: var(--green-light);
-  color: var(--green-dark);
-  border-radius: var(--radius);
-  padding: 16px 20px;
-  font-size: 0.88rem;
-  margin-top: 16px;
-}
-
-.form-success.show { display: block; }
 
 /* ============================================================
    FOOTER
@@ -853,7 +718,6 @@ footer {
        HERO
   ============================================================ -->
   <section id="hero">
-    <!-- Animated leaf background -->
     <svg class="hero-bg" viewBox="0 0 1200 500" preserveAspectRatio="xMidYMid slice">
       <g fill="#40916C">
         <ellipse class="leaf" cx="150" cy="400" rx="60" ry="200" />
@@ -902,10 +766,78 @@ footer {
   </section>
 
   <!-- ============================================================
+       PRINCIPAL'S WELCOME MESSAGE
+       Placeholder message — replace name, photo, and quote with
+       the actual principal's before go-live.
+  ============================================================ -->
+  <section id="principal-welcome">
+    <div class="container">
+      <div class="principal-grid">
+        <div class="principal-photo-wrap">
+          <div class="principal-photo">MM</div>
+          <div class="principal-name">Dr. Michael A. Marquez</div>
+          <div class="principal-role">Punong-guro, TCTAR Integrated Farm School</div>
+        </div>
+        <div class="principal-quote">
+          <p class="section-label">Mensahe Mula sa Punong-guro</p>
+          <p>Sa ngalan ng buong pamilya ng Tiu Cho Teg - Ana Ros Foundation Integrated Farm School, malugod ko kayong tinatanggap. Dito, naniniwala kami na ang tunay na edukasyon ay hindi lamang natututunan sa loob ng silid-aralan — ito ay nabubuo rin sa bukid, sa komunidad, at sa puso ng bawat mag-aaral.</p>
+          <p>Bilang isa sa mga pangunahing Integrated Farm School sa bansa, ipinagmamalaki namin ang aming natatanging programa na pinagsasama ang akademikong kahusayan at praktikal na kaalaman sa agrikultura. Layunin naming ihanda ang bawat mag-aaral hindi lamang para sa kolehiyo, kundi para sa buhay.</p>
+          <p>Kami ay narito upang suportahan ang inyong anak sa bawat hakbang ng kanilang paglalakbay. Maligayang pagdating sa aming paaralan!</p>
+          <p class="principal-signoff">— Dr. Michael A. Marquez</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       SCHOOL HISTORY
+  ============================================================ -->
+  <section id="school-history">
+    <div class="container">
+      <div class="history-grid">
+        <div class="history-text">
+          <p class="section-label">Kasaysayan ng Paaralan</p>
+          <h2 class="section-title">Mula Lanit Primary School Tungo sa Isang Integrated Farm School</h2>
+          <p>Ang Tiu Cho Teg - Ana Ros Foundation Integrated Farm School ay dating kilala bilang Lanit Primary School. Sa paglipas ng panahon, ito ay lumago upang maging isa sa mga unang DepEd-run Integrated Farm School sa buong bansa — at kinikilala bilang unang urban farm school sa Pilipinas.</p>
+          <p>Matatagpuan sa Barangay Lanit, Jaro, Iloilo City, ang paaralan ay naglilingkod sa isang relocation site community, na nagbibigay ng access sa de-kalidad na edukasyong pampubliko para sa mga pamilyang Ilonggo.</p>
+          <p>Sa pamamagitan ng malapit na pakikipagtulungan ng DepEd, Pamahalaang Lungsod ng Iloilo, at ni Punong-lungsod Jerry Treñas — na nag-donate ng multi-storey na gusali para sa paaralan — patuloy na umuunlad ang aming mga pasilidad at programa.</p>
+        </div>
+        <div class="history-milestones">
+          <div class="milestone-item">
+            <div class="milestone-icon">🏫</div>
+            <div>
+              <h4>Mula Lanit Primary School</h4>
+              <p>Nagsimula bilang isang ordinaryong paaralang elementarya sa Lanit, Jaro</p>
+            </div>
+          </div>
+          <div class="milestone-item">
+            <div class="milestone-icon">🌱</div>
+            <div>
+              <h4>Unang Urban Farm School sa Bansa</h4>
+              <p>Isa sa mga unang itinatag na DepEd Integrated Farm School, nakatuon sa mushroom culture, vegetable gardening, at hydroponics</p>
+            </div>
+          </div>
+          <div class="milestone-item">
+            <div class="milestone-icon">🏗️</div>
+            <div>
+              <h4>Suporta mula sa LGU Iloilo City</h4>
+              <p>Multi-storey na gusali na inialay ni Punong-lungsod Jerry Treñas upang palawakin ang mga pasilidad ng paaralan</p>
+            </div>
+          </div>
+          <div class="milestone-item">
+            <div class="milestone-icon">🌳</div>
+            <div>
+              <h4>Kilalang Environmental Programs</h4>
+              <p>Host ng ECo Champions tree-planting launch (Hunyo 2025) at DA-supported Gulayan sa Bakanteng Lote project</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
        VIDEO HIGHLIGHT
-       Controlled entirely from the Admin Panel (Video tab). If no
-       video has been set by the admin, this section stays hidden
-       — nothing renders here at all.
   ============================================================ -->
   <section id="video-highlight" style="display:none;">
     <div class="container">
@@ -914,13 +846,12 @@ footer {
         <h2 class="section-title">Kilalanin ang Aming Paaralan</h2>
         <p id="videoDescription" style="color:var(--text-muted); font-size:0.92rem;"></p>
       </div>
-
       <div class="video-embed-wrapper" id="videoEmbedWrapper"></div>
     </div>
   </section>
 
   <!-- ============================================================
-       LATEST ANNOUNCEMENT PREVIEW (top 2, links to full page)
+       LATEST ANNOUNCEMENT PREVIEW
   ============================================================ -->
   <section id="announcements">
     <div class="container">
@@ -934,6 +865,54 @@ footer {
       <div style="text-align:center; margin-top:32px;">
         <a href="announcements.html" class="btn btn-outline" style="color:var(--green-dark); border-color:var(--green-mid);">Tingnan Lahat ng Balita →</a>
       </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       TESTIMONIALS (placeholder — replace with real quotes/photos)
+  ============================================================ -->
+  <section id="testimonials">
+    <div class="container">
+      <div class="testimonials-header">
+        <p class="section-label">Mga Sinasabi Nila</p>
+        <h2 class="section-title">Mula sa Aming Komunidad</h2>
+      </div>
+      <div class="testimonials-grid">
+        <div class="testimonial-card">
+          <div class="testimonial-stars">★★★★★</div>
+          <p class="testimonial-text">"Napakasuwerte namin na naging bahagi ang aming anak ng Integrated Farm School program. Natututo siya hindi lang sa libro, kundi pati na rin sa totoong buhay na karanasan sa pagsasaka."</p>
+          <div class="testimonial-person">
+            <div class="testimonial-avatar">MR</div>
+            <div>
+              <div class="testimonial-name">Maria Reyes</div>
+              <div class="testimonial-role">Magulang ng Mag-aaral</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="testimonial-stars">★★★★★</div>
+          <p class="testimonial-text">"Masaya ako dito dahil hindi lang kami nag-aaral sa loob ng classroom — nagtatanim din kami at natututo kung paano mag-alaga ng halaman. Iba talaga ang TCTAR!"</p>
+          <div class="testimonial-person">
+            <div class="testimonial-avatar">JD</div>
+            <div>
+              <div class="testimonial-name">Jericho Dela Cruz</div>
+              <div class="testimonial-role">Mag-aaral, Grade 10</div>
+            </div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="testimonial-stars">★★★★★</div>
+          <p class="testimonial-text">"Bilang isang alumna, ipinagmamalaki ko na dito ako nag-aral. Ang mga natutunan kong disiplina at kasipagan sa farm school program ay tumutulong sa akin hanggang ngayon."</p>
+          <div class="testimonial-person">
+            <div class="testimonial-avatar">AS</div>
+            <div>
+              <div class="testimonial-name">Angelica Santos</div>
+              <div class="testimonial-role">Alumna</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <p class="testimonial-disclaimer">Halimbawang mga testimonial lamang ito — palitan ng aktuwal na mga sinasabi ng mga magulang, mag-aaral, at alumni bago ilathala.</p>
     </div>
   </section>
 
@@ -955,16 +934,6 @@ footer {
        SCRIPTS
   ============================================================ -->
   <script>
-/* ============================================================
-   SHARED NAVIGATION + FOOTER
-   Injects the same nav bar and footer into every public page,
-   so there is exactly one place to edit them. Each page just
-   needs:
-     <div id="nav-root"></div>
-     <div id="footer-root"></div>
-   and must load this file, then call initSite('pageId').
-============================================================ */
-
 const SITE_LINKS = [
   { id: 'home',          href: 'index.html',         label: 'Home' },
   { id: 'announcements',  href: 'announcements.html', label: 'Balita' },
@@ -1035,12 +1004,10 @@ function initSite(activePage) {
   renderFooter();
 }
 
-  </script>
-  <script>
-    initSite('home');
+initSite('home');
 
-    // --- Load data.json and render latest 2 announcements + video ---
-    const API = 'https://tctar-api.onrender.com';
+// --- Load announcements + video from the live API ---
+const API = 'https://tctar-api.onrender.com';
 
 async function loadData() {
   try {
