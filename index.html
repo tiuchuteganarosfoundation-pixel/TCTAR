@@ -877,42 +877,10 @@ footer {
         <p class="section-label">Mga Sinasabi Nila</p>
         <h2 class="section-title">Mula sa Aming Komunidad</h2>
       </div>
-      <div class="testimonials-grid">
-        <div class="testimonial-card">
-          <div class="testimonial-stars">★★★★★</div>
-          <p class="testimonial-text">"Napakasuwerte namin na naging bahagi ang aming anak ng Integrated Farm School program. Natututo siya hindi lang sa libro, kundi pati na rin sa totoong buhay na karanasan sa pagsasaka."</p>
-          <div class="testimonial-person">
-            <div class="testimonial-avatar">MR</div>
-            <div>
-              <div class="testimonial-name">Maria Reyes</div>
-              <div class="testimonial-role">Magulang ng Mag-aaral</div>
-            </div>
-          </div>
-        </div>
-        <div class="testimonial-card">
-          <div class="testimonial-stars">★★★★★</div>
-          <p class="testimonial-text">"Masaya ako dito dahil hindi lang kami nag-aaral sa loob ng classroom — nagtatanim din kami at natututo kung paano mag-alaga ng halaman. Iba talaga ang TCTAR!"</p>
-          <div class="testimonial-person">
-            <div class="testimonial-avatar">JD</div>
-            <div>
-              <div class="testimonial-name">Jericho Dela Cruz</div>
-              <div class="testimonial-role">Mag-aaral, Grade 10</div>
-            </div>
-          </div>
-        </div>
-        <div class="testimonial-card">
-          <div class="testimonial-stars">★★★★★</div>
-          <p class="testimonial-text">"Bilang isang alumna, ipinagmamalaki ko na dito ako nag-aral. Ang mga natutunan kong disiplina at kasipagan sa farm school program ay tumutulong sa akin hanggang ngayon."</p>
-          <div class="testimonial-person">
-            <div class="testimonial-avatar">AS</div>
-            <div>
-              <div class="testimonial-name">Angelica Santos</div>
-              <div class="testimonial-role">Alumna</div>
-            </div>
-          </div>
-        </div>
+      <div class="testimonials-grid" id="testimonialsGrid">
+        <p class="no-content">Naglo-load ng mga testimonial...</p>
       </div>
-      <p class="testimonial-disclaimer">Halimbawang mga testimonial lamang ito — palitan ng aktuwal na mga sinasabi ng mga magulang, mag-aaral, at alumni bago ilathala.</p>
+      <p class="testimonial-disclaimer" id="testimonialDisclaimer" style="display:none;">Halimbawang mga testimonial lamang ito — palitan ng aktuwal na mga sinasabi ng mga magulang, mag-aaral, at alumni bago ilathala.</p>
     </div>
   </section>
 
@@ -1011,14 +979,17 @@ const API = 'https://tctar-api.onrender.com';
 
 async function loadData() {
   try {
-    const [annRes, vidRes] = await Promise.all([
+    const [annRes, vidRes, testRes] = await Promise.all([
       fetch(`${API}/website/announcements`),
-      fetch(`${API}/website/video`)
+      fetch(`${API}/website/video`),
+      fetch(`${API}/website/testimonials`)
     ]);
     const announcements = await annRes.json();
     const video = await vidRes.json();
+    const testimonials = await testRes.json();
     renderLatestAnnouncement(announcements[0] || null);
     renderVideo(video);
+    renderTestimonials(testimonials);
   } catch (e) {
     document.getElementById('announcementsGrid').innerHTML =
       '<p class="no-content">Hindi ma-load ang balita sa ngayon.</p>';
@@ -1075,6 +1046,43 @@ function renderLatestAnnouncement(a) {
       <p style="margin-top:12px; color:var(--green-mid); font-size:0.82rem; font-weight:600;">Basahin ang buong balita →</p>
     </div>
   `;
+}
+
+function renderTestimonials(testimonials) {
+  const grid = document.getElementById('testimonialsGrid');
+  const disclaimer = document.getElementById('testimonialDisclaimer');
+
+  const SAMPLE_TESTIMONIALS = [
+    { name: 'Maria Reyes', role: 'Magulang ng Mag-aaral', rating: 5,
+      quote: 'Napakasuwerte namin na naging bahagi ang aming anak ng Integrated Farm School program. Natututo siya hindi lang sa libro, kundi pati na rin sa totoong buhay na karanasan sa pagsasaka.' },
+    { name: 'Jericho Dela Cruz', role: 'Mag-aaral, Grade 10', rating: 5,
+      quote: 'Masaya ako dito dahil hindi lang kami nag-aaral sa loob ng classroom — nagtatanim din kami at natututo kung paano mag-alaga ng halaman. Iba talaga ang TCTAR!' },
+    { name: 'Angelica Santos', role: 'Alumna', rating: 5,
+      quote: 'Bilang isang alumna, ipinagmamalaki ko na dito ako nag-aral. Ang mga natutunan kong disiplina at kasipagan sa farm school program ay tumutulong sa akin hanggang ngayon.' }
+  ];
+
+  const usingSamples = !testimonials || testimonials.length === 0;
+  const list = usingSamples ? SAMPLE_TESTIMONIALS : testimonials;
+
+  disclaimer.style.display = usingSamples ? 'block' : 'none';
+
+  grid.innerHTML = list.map(t => {
+    const initials = t.name.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+    const stars = '★'.repeat(t.rating) + '☆'.repeat(5 - t.rating);
+    return `
+      <div class="testimonial-card">
+        <div class="testimonial-stars">${stars}</div>
+        <p class="testimonial-text">"${t.quote}"</p>
+        <div class="testimonial-person">
+          <div class="testimonial-avatar">${initials}</div>
+          <div>
+            <div class="testimonial-name">${t.name}</div>
+            <div class="testimonial-role">${t.role}</div>
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
 }
 
 function formatDate(dateStr) {

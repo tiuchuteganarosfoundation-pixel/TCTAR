@@ -282,6 +282,7 @@
         <button class="tab-btn active" onclick="switchTab('announcements')">📢 Mga Anunsyo</button>
         <button class="tab-btn" onclick="switchTab('faqs')">❓ FAQs</button>
         <button class="tab-btn" onclick="switchTab('video')">🎥 Video</button>
+        <button class="tab-btn" onclick="switchTab('testimonials')">💬 Mga Testimonial</button>
         <button class="tab-btn" onclick="switchTab('export')">💾 I-Export / I-Import</button>
       </div>
 
@@ -364,6 +365,46 @@
         </div>
       </div>
 
+      <!-- TESTIMONIALS TAB -->
+      <div class="tab-panel" id="tab-testimonials">
+        <div class="card">
+          <h3>➕ Bagong Testimonial</h3>
+          <p style="font-size:0.85rem; color:var(--muted); margin-bottom:16px;" id="testimonial-count-note">
+            Pinapayagan lang hanggang 5 testimonial. (<span id="testimonial-count">0</span>/5)
+          </p>
+          <div class="field">
+            <label>Pangalan</label>
+            <input type="text" id="test-name" placeholder="Halimbawa: Maria Reyes" />
+          </div>
+          <div class="field">
+            <label>Tungkulin</label>
+            <input type="text" id="test-role" placeholder="Halimbawa: Magulang ng Mag-aaral, Mag-aaral Grade 10, Alumna" />
+          </div>
+          <div class="field">
+            <label>Sinabi Nila</label>
+            <textarea id="test-quote" placeholder="Ilagay ang testimonial dito..."></textarea>
+          </div>
+          <div class="field">
+            <label>Rating</label>
+            <select id="test-rating">
+              <option value="5">★★★★★ (5)</option>
+              <option value="4">★★★★☆ (4)</option>
+              <option value="3">★★★☆☆ (3)</option>
+              <option value="2">★★☆☆☆ (2)</option>
+              <option value="1">★☆☆☆☆ (1)</option>
+            </select>
+          </div>
+          <button class="btn btn-gold" id="test-add-btn" onclick="addTestimonial()">➕ Idagdag ang Testimonial</button>
+        </div>
+
+        <div class="card">
+          <h3>📋 Mga Kasalukuyang Testimonial</h3>
+          <div class="item-list" id="test-list">
+            <div class="empty-state">Walang testimonial pa.</div>
+          </div>
+        </div>
+      </div>
+
       <!-- EXPORT TAB -->
       <div class="tab-panel" id="tab-export">
         <div class="card">
@@ -425,7 +466,7 @@
 
     // LOAD ALL DATA FROM API
     async function loadAll() {
-      await Promise.all([loadAnnouncements(), loadFAQs(), loadVideo()]);
+      await Promise.all([loadAnnouncements(), loadFAQs(), loadVideo(), loadTestimonials()]);
     }
 
     // ============================================================
@@ -646,6 +687,94 @@
       `;
       document.getElementById('video-url').value = video.url || '';
       document.getElementById('video-description').value = video.description || '';
+    }
+
+    // ============================================================
+    // TESTIMONIALS (max 5)
+    // ============================================================
+    const MAX_TESTIMONIALS = 5;
+    let testimonials = [];
+
+    async function loadTestimonials() {
+      try {
+        const res = await fetch(`${API}/website/testimonials`);
+        testimonials = await res.json();
+        renderTestimonialList();
+      } catch (e) {
+        showToast('❌ Hindi ma-load ang mga testimonial.');
+      }
+    }
+
+    async function addTestimonial() {
+      if (testimonials.length >= MAX_TESTIMONIALS) {
+        showToast(`❌ Limitado lang sa ${MAX_TESTIMONIALS} testimonial. Magtanggal muna ng isa.`);
+        return;
+      }
+
+      const name   = document.getElementById('test-name').value.trim();
+      const role   = document.getElementById('test-role').value.trim();
+      const quote  = document.getElementById('test-quote').value.trim();
+      const rating = parseInt(document.getElementById('test-rating').value, 10);
+
+      if (!name || !role || !quote) { showToast('Punan ang lahat ng field.'); return; }
+
+      try {
+        const res = await fetch(`${API}/website/testimonials`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, role, quote, rating })
+        });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.detail || 'Save failed');
+        }
+        document.getElementById('test-name').value = '';
+        document.getElementById('test-role').value = '';
+        document.getElementById('test-quote').value = '';
+        document.getElementById('test-rating').value = '5';
+        showToast('✅ Naidagdag ang testimonial!');
+        await loadTestimonials();
+      } catch (e) {
+        showToast(`❌ ${e.message === 'Save failed' ? 'Hindi na-save ang testimonial. Subukan muli.' : e.message}`);
+      }
+    }
+
+    async function deleteTestimonial(id) {
+      if (!confirm('Tanggalin ang testimonial na ito?')) return;
+      try {
+        await fetch(`${API}/website/testimonials/${id}`, { method: 'DELETE' });
+        showToast('🗑️ Natanggal ang testimonial.');
+        await loadTestimonials();
+      } catch (e) {
+        showToast('❌ Hindi natanggal. Subukan muli.');
+      }
+    }
+
+    function renderTestimonialList() {
+      document.getElementById('testimonial-count').textContent = testimonials.length;
+
+      const addBtn = document.getElementById('test-add-btn');
+      addBtn.disabled = testimonials.length >= MAX_TESTIMONIALS;
+      addBtn.style.opacity = addBtn.disabled ? '0.5' : '1';
+      addBtn.style.cursor = addBtn.disabled ? 'not-allowed' : 'pointer';
+
+      const list = document.getElementById('test-list');
+      if (!testimonials.length) {
+        list.innerHTML = '<div class="empty-state">Walang testimonial pa. Magdagdag ng bago sa itaas.</div>';
+        return;
+      }
+      list.innerHTML = testimonials.map(t => `
+        <div class="item-row">
+          <div class="item-content">
+            <strong>${t.name}</strong> — <span style="color:var(--muted); font-size:0.82rem;">${t.role}</span>
+            <p>${'★'.repeat(t.rating)}${'☆'.repeat(5 - t.rating)}</p>
+            <p>"${t.quote}"</p>
+          </div>
+          <div class="item-actions">
+            <button class="btn btn-sm btn-danger" onclick="deleteTestimonial(${t.id})">Tanggalin</button>
+          </div>
+        </div>
+      `).join('');
     }
 
     // ============================================================
