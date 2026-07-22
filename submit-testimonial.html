@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="fil">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Magbahagi ng Testimonial — Tiu Cho Teg - Ana Ros Foundation Integrated Farm School</title>
+  <link rel="icon" type="image/png" href="assets/logo.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    #submit-section { padding: 72px 0; }
+    .submit-form {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 32px;
+      max-width: 640px;
+      margin: 0 auto;
+    }
+    .star-picker {
+      display: flex;
+      gap: 8px;
+      font-size: 1.8rem;
+      cursor: pointer;
+      user-select: none;
+    }
+    .star-picker span { color: #D0D0D0; transition: color 0.15s; }
+    .star-picker span.filled { color: var(--gold); }
+    .submit-note {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-top: 12px;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="nav-root"></div>
+
+  <section class="page-hero">
+    <p class="section-label">Magbahagi ng Karanasan</p>
+    <h1>Magbahagi ng Iyong Testimonial</h1>
+    <p>Ikuwento sa amin ang inyong karanasan sa TCTAR Integrated Farm School. Susuriin muna namin ang inyong testimonial bago ito mailathala sa homepage.</p>
+  </section>
+
+  <section id="submit-section">
+    <div class="container">
+      <div class="submit-form" id="formWrap">
+        <h3 style="color:var(--green-dark); margin-bottom:20px;">Isumite ang Inyong Testimonial</h3>
+
+        <div class="form-row">
+          <label>Buong Pangalan</label>
+          <input type="text" id="sub-name" placeholder="Halimbawa: Juan Dela Cruz" />
+        </div>
+
+        <div class="form-row">
+          <label>Kayo ba ay...</label>
+          <select id="sub-role">
+            <option value="">Piliin ang inyong papel</option>
+            <option value="Magulang ng Mag-aaral">Magulang ng Mag-aaral</option>
+            <option value="Kasalukuyang Mag-aaral">Kasalukuyang Mag-aaral</option>
+            <option value="Alumno/Alumna">Alumno/Alumna</option>
+            <option value="Guro/Kawani">Guro/Kawani</option>
+            <option value="Iba pa">Iba pa</option>
+          </select>
+        </div>
+
+        <div class="form-row">
+          <label>Rating</label>
+          <div class="star-picker" id="starPicker">
+            <span data-val="1">★</span>
+            <span data-val="2">★</span>
+            <span data-val="3">★</span>
+            <span data-val="4">★</span>
+            <span data-val="5">★</span>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label>Ang Inyong Testimonial</label>
+          <textarea id="sub-quote" rows="5" placeholder="Ikuwento ang inyong karanasan sa aming paaralan..."></textarea>
+        </div>
+
+        <button class="btn btn-primary" style="color:var(--green-dark);" onclick="submitTestimonial()">Isumite ang Testimonial</button>
+        <p class="submit-note">Susuriin muna namin ang bawat testimonial bago ito ilathala sa homepage. Salamat sa inyong pagbabahagi!</p>
+
+        <div class="form-success" id="successMsg">
+          ✅ Salamat! Naisumite na ang inyong testimonial at naghihintay na lang ito ng pag-apruba.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div id="footer-root"></div>
+
+  <script src="nav.js"></script>
+  <script>
+    initSite('');
+
+    const API = 'https://tctar-api.onrender.com';
+    let selectedRating = 5;
+
+    function paintStars() {
+      document.querySelectorAll('#starPicker span').forEach(s => {
+        s.classList.toggle('filled', parseInt(s.dataset.val, 10) <= selectedRating);
+      });
+    }
+    document.querySelectorAll('#starPicker span').forEach(s => {
+      s.addEventListener('click', () => {
+        selectedRating = parseInt(s.dataset.val, 10);
+        paintStars();
+      });
+    });
+    paintStars();
+
+    async function submitTestimonial() {
+      const name  = document.getElementById('sub-name').value.trim();
+      const role  = document.getElementById('sub-role').value;
+      const quote = document.getElementById('sub-quote').value.trim();
+
+      if (!name || !role || !quote) {
+        alert('Punan ang lahat ng field bago isumite.');
+        return;
+      }
+
+      try {
+        const res = await fetch(`${API}/website/testimonials/submit`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, role, quote, rating: selectedRating })
+        });
+        if (!res.ok) throw new Error();
+
+        document.getElementById('formWrap').querySelectorAll('input, select, textarea, button.btn').forEach(el => el.style.display = 'none');
+        document.querySelector('#formWrap h3').style.display = 'none';
+        document.querySelector('.submit-note').style.display = 'none';
+        document.getElementById('successMsg').classList.add('show');
+      } catch (e) {
+        alert('Hindi naisumite ang testimonial. Subukan muli.');
+      }
+    }
+  </script>
+</body>
+</html>

@@ -368,9 +368,19 @@
       <!-- TESTIMONIALS TAB -->
       <div class="tab-panel" id="tab-testimonials">
         <div class="card">
-          <h3>➕ Bagong Testimonial</h3>
+          <h3>⏳ Naghihintay ng Pag-apruba</h3>
+          <p style="font-size:0.85rem; color:var(--muted); margin-bottom:16px;">
+            Mga testimonial na direktang isinumite ng publiko sa pamamagitan ng submission form. I-approve para lumabas sa homepage, o i-reject kung hindi angkop.
+          </p>
+          <div class="item-list" id="test-pending-list">
+            <div class="empty-state">Walang naghihintay na testimonial.</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>➕ Magdagdag Mismo (Staff-Entered)</h3>
           <p style="font-size:0.85rem; color:var(--muted); margin-bottom:16px;" id="testimonial-count-note">
-            Pinapayagan lang hanggang 5 testimonial. (<span id="testimonial-count">0</span>/5)
+            Ito ay direktang lalabas sa homepage nang walang approval step. Pinapayagan lang hanggang 5 approved na testimonial sa homepage. (<span id="testimonial-count">0</span>/5)
           </p>
           <div class="field">
             <label>Pangalan</label>
@@ -398,7 +408,7 @@
         </div>
 
         <div class="card">
-          <h3>📋 Mga Kasalukuyang Testimonial</h3>
+          <h3>📋 Mga Naka-publish sa Homepage</h3>
           <div class="item-list" id="test-list">
             <div class="empty-state">Walang testimonial pa.</div>
           </div>
@@ -690,16 +700,22 @@
     }
 
     // ============================================================
-    // TESTIMONIALS (max 5)
+    // TESTIMONIALS (approved: max 5, pending: unlimited queue)
     // ============================================================
     const MAX_TESTIMONIALS = 5;
     let testimonials = [];
+    let pendingTestimonials = [];
 
     async function loadTestimonials() {
       try {
-        const res = await fetch(`${API}/website/testimonials`);
-        testimonials = await res.json();
+        const [approvedRes, pendingRes] = await Promise.all([
+          fetch(`${API}/website/testimonials`),
+          fetch(`${API}/website/testimonials/pending`)
+        ]);
+        testimonials = await approvedRes.json();
+        pendingTestimonials = await pendingRes.json();
         renderTestimonialList();
+        renderPendingList();
       } catch (e) {
         showToast('❌ Hindi ma-load ang mga testimonial.');
       }
@@ -707,7 +723,7 @@
 
     async function addTestimonial() {
       if (testimonials.length >= MAX_TESTIMONIALS) {
-        showToast(`❌ Limitado lang sa ${MAX_TESTIMONIALS} testimonial. Magtanggal muna ng isa.`);
+        showToast(`❌ Limitado lang sa ${MAX_TESTIMONIALS} approved na testimonial. Magtanggal muna ng isa.`);
         return;
       }
 
@@ -736,6 +752,20 @@
         await loadTestimonials();
       } catch (e) {
         showToast(`❌ ${e.message === 'Save failed' ? 'Hindi na-save ang testimonial. Subukan muli.' : e.message}`);
+      }
+    }
+
+    async function approveTestimonial(id) {
+      try {
+        const res = await fetch(`${API}/website/testimonials/${id}/approve`, { method: 'PUT' });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.detail || 'Approve failed');
+        }
+        showToast('✅ Na-approve ang testimonial!');
+        await loadTestimonials();
+      } catch (e) {
+        showToast(`❌ ${e.message === 'Approve failed' ? 'Hindi na-approve. Subukan muli.' : e.message}`);
       }
     }
 
@@ -777,7 +807,29 @@
       `).join('');
     }
 
+    function renderPendingList() {
+      const list = document.getElementById('test-pending-list');
+      if (!pendingTestimonials.length) {
+        list.innerHTML = '<div class="empty-state">Walang naghihintay na testimonial.</div>';
+        return;
+      }
+      list.innerHTML = pendingTestimonials.map(t => `
+        <div class="item-row">
+          <div class="item-content">
+            <strong>${t.name}</strong> — <span style="color:var(--muted); font-size:0.82rem;">${t.role}</span>
+            <p>${'★'.repeat(t.rating)}${'☆'.repeat(5 - t.rating)}</p>
+            <p>"${t.quote}"</p>
+          </div>
+          <div class="item-actions">
+            <button class="btn btn-sm btn-green" onclick="approveTestimonial(${t.id})">✅ Aprubahan</button>
+            <button class="btn btn-sm btn-danger" onclick="deleteTestimonial(${t.id})">❌ Tanggihan</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
     // ============================================================
+
     // EXPORT TAB — now just informational since API handles saving
     // ============================================================
     function exportData() {
