@@ -1395,7 +1395,7 @@ footer {
                 <div class="form-row"><label>Petsa</label><input type="date" id="signDate" /></div>
               </div>
               <div class="form-row-split">
-                <div class="form-row"><label>Contact Number para sa Follow-up <span class="req">*</span></label><input type="tel" id="contactNumber" required /></div>
+                <div class="form-row"><label>Contact Number para sa Follow-up <span class="req">*</span></label><input type="tel" id="contactNumber" maxlength="11" inputmode="numeric" pattern="[0-9]{11}" title="11 digits lang, halimbawa: 09171234567" required /></div>
                 <div class="form-row">
                   <label>Email Address <span class="req">*</span></label>
                   <input type="email" id="contactEmail" required />
@@ -1418,12 +1418,16 @@ footer {
             <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center; margin-top:24px; background:var(--gold);">✏️ Isumite ang ALS Enrollment Form</button>
 
             <div class="form-success" id="formSuccess">
-              <p style="margin-bottom:10px;">✅ Salamat! Narito ang buod ng inyong isinumiteng impormasyon. Piliin ang isa sa mga aksyon sa ibaba para maipadala ito sa aming ALS coordinator.</p>
-              <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px;">
-                <button type="button" class="btn btn-outline" style="background:var(--green-dark); color:#fff;" onclick="sendViaEmail()">📧 Ipadala sa Email</button>
-                <button type="button" class="btn btn-outline" style="border-color:var(--green-mid); color:var(--green-dark);" onclick="copySummary()">📋 Kopyahin ang Buod</button>
+              <p id="successMainMessage" style="margin-bottom:0;">✅ Salamat! Natanggap na ang inyong ALS enrollment application. Susuriin ito ng aming ALS coordinator at aabisuhan kayo sa pamamagitan ng email o tawag.</p>
+
+              <div id="fallbackBlock" style="display:none; margin-top:14px;">
+                <p style="margin-bottom:10px; color:#B00020; font-weight:600;">⚠️ Nagkaproblema sa pag-save ng inyong application sa aming sistema. Mangyaring ipadala ang buod sa ibaba nang direkta sa amin.</p>
+                <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px;">
+                  <button type="button" class="btn btn-outline" style="background:var(--green-dark); color:#fff;" onclick="sendViaEmail()">📧 Ipadala sa Email</button>
+                  <button type="button" class="btn btn-outline" style="border-color:var(--green-mid); color:var(--green-dark);" onclick="copySummary()">📋 Kopyahin ang Buod</button>
+                </div>
+                <pre id="summaryBox" style="white-space:pre-wrap; background:#fff; border:1px solid #D0E4D8; border-radius:8px; padding:14px; font-size:0.78rem; max-height:340px; overflow-y:auto; font-family:inherit;"></pre>
               </div>
-              <pre id="summaryBox" style="white-space:pre-wrap; background:#fff; border:1px solid #D0E4D8; border-radius:8px; padding:14px; font-size:0.78rem; max-height:340px; overflow-y:auto; font-family:inherit;"></pre>
             </div>
 
           </form>
@@ -1528,6 +1532,11 @@ function initSite(activePage) {
 
     let lastSummary = '';
 
+    // Phone number: digits only, max 11
+    document.getElementById('contactNumber').addEventListener('input', function () {
+      this.value = this.value.replace(/\D/g, '').slice(0, 11);
+    });
+
     document.getElementById('alsForm').addEventListener('submit', function (e) {
       e.preventDefault();
 
@@ -1613,13 +1622,7 @@ function initSite(activePage) {
         console.log('Application submitted to registrar system successfully.');
       } catch (e) {
         console.error('Failed to submit application to registrar system:', e);
-        const successBox = document.getElementById('formSuccess');
-        const warn = document.createElement('p');
-        warn.style.color = '#B00020';
-        warn.style.marginTop = '12px';
-        warn.style.fontWeight = '600';
-        warn.textContent = '⚠️ Nagkaproblema sa pag-save ng inyong application sa aming sistema. Mangyaring i-email o kopyahin ang buod sa ibaba at ipadala nang direkta sa amin.';
-        successBox.appendChild(warn);
+        document.getElementById('fallbackBlock').style.display = 'block';
       }
     }
 
