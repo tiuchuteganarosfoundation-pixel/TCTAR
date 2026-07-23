@@ -1217,13 +1217,13 @@ footer {
             <!-- PART I -->
             <div class="form-section">
               <h3><span class="form-section-num">1</span>Personal Information (Part I)</h3>
-              <div class="form-row"><label>LRN <span class="hint">kung mayroon</span></label><input type="text" id="lrn" maxlength="12" /></div>
+              <div class="form-row"><label>LRN <span class="hint">kung mayroon</span></label><input type="text" id="lrn" class="only-numbers" maxlength="12" maxlength="12" /></div>
               <div class="form-row-triple">
-                <div class="form-row"><label>Apelyido (Last Name) <span class="req">*</span></label><input type="text" id="lastName" required /></div>
-                <div class="form-row"><label>Pangalan (First Name) <span class="req">*</span></label><input type="text" id="firstName" required /></div>
-                <div class="form-row"><label>Gitnang Pangalan (Middle Name)</label><input type="text" id="middleName" /></div>
+                <div class="form-row"><label>Apelyido (Last Name) <span class="req">*</span></label><input type="text" id="lastName" class="only-letters" required /></div>
+                <div class="form-row"><label>Pangalan (First Name) <span class="req">*</span></label><input type="text" id="firstName" class="only-letters" required /></div>
+                <div class="form-row"><label>Gitnang Pangalan (Middle Name)</label><input type="text" id="middleName" class="only-letters" /></div>
               </div>
-              <div class="form-row"><label>Name Extension <span class="hint">Jr., III, atbp.</span></label><input type="text" id="extName" style="max-width:220px;" /></div>
+              <div class="form-row"><label>Name Extension <span class="hint">Jr., III, atbp.</span></label><input type="text" id="extName" class="only-letters" style="max-width:220px;" /></div>
 
               <div class="form-row"><label>House No. / Street / Sitio <span class="req">*</span></label><input type="text" id="street" required /></div>
               <div class="form-row-triple">
@@ -1259,27 +1259,27 @@ footer {
                     <label class="choice-pill"><input type="radio" name="pwd" value="Hindi" checked /> Hindi</label>
                   </div>
                 </div>
-                <div class="form-row"><label>Relihiyon</label><input type="text" id="religion" /></div>
-                <div class="form-row"><label>Unang Wika (Mother Tongue)</label><input type="text" id="motherTongue" /></div>
+                <div class="form-row"><label>Relihiyon</label><input type="text" id="religion" class="only-letters" /></div>
+                <div class="form-row"><label>Unang Wika (Mother Tongue)</label><input type="text" id="motherTongue" class="only-letters" /></div>
               </div>
 
               <div class="form-row">
                 <label>Katutubong Grupo (IP) <span class="hint">tukuyin kung naaangkop</span></label>
-                <input type="text" id="ipGroup" />
+                <input type="text" id="ipGroup" class="only-letters" />
               </div>
 
               <p style="font-weight:600;color:var(--green-dark);font-size:0.85rem;margin:16px 0 8px;">Ama / Legal Guardian</p>
               <div class="form-row-triple">
-                <div class="form-row"><label>Apelyido</label><input type="text" id="fatherLast" /></div>
-                <div class="form-row"><label>Pangalan</label><input type="text" id="fatherFirst" /></div>
-                <div class="form-row"><label>Trabaho (Occupation)</label><input type="text" id="fatherOccupation" /></div>
+                <div class="form-row"><label>Apelyido</label><input type="text" id="fatherLast" class="only-letters" /></div>
+                <div class="form-row"><label>Pangalan</label><input type="text" id="fatherFirst" class="only-letters" /></div>
+                <div class="form-row"><label>Trabaho (Occupation)</label><input type="text" id="fatherOccupation" class="only-letters" /></div>
               </div>
 
               <p style="font-weight:600;color:var(--green-dark);font-size:0.85rem;margin:16px 0 8px;">Ina (Maiden Name)</p>
               <div class="form-row-triple">
-                <div class="form-row"><label>Apelyido</label><input type="text" id="motherLast" /></div>
-                <div class="form-row"><label>Pangalan</label><input type="text" id="motherFirst" /></div>
-                <div class="form-row"><label>Trabaho (Occupation)</label><input type="text" id="motherOccupation" /></div>
+                <div class="form-row"><label>Apelyido</label><input type="text" id="motherLast" class="only-letters" /></div>
+                <div class="form-row"><label>Pangalan</label><input type="text" id="motherFirst" class="only-letters" /></div>
+                <div class="form-row"><label>Trabaho (Occupation)</label><input type="text" id="motherOccupation" class="only-letters" /></div>
               </div>
             </div>
 
@@ -1336,7 +1336,7 @@ footer {
                   </div>
                 </div>
                 <div class="form-row-split">
-                  <div class="form-row"><label>Taon na Sinalihan</label><input type="text" id="alsYearAttended" placeholder="hal. 2023" /></div>
+                  <div class="form-row"><label>Taon na Sinalihan</label><input type="text" id="alsYearAttended" class="only-numbers" maxlength="4" placeholder="hal. 2023" /></div>
                   <div class="form-row">
                     <label>Natapos ang Programa?</label>
                     <div class="choice-group">
@@ -1391,7 +1391,7 @@ footer {
                 Sa pag-type ng aking buong pangalan sa ibaba, pinapatunayan ko na totoo at tama ang lahat ng impormasyong ibinigay sa form na ito, bilang kapalit ng aktwal na lagda na kokolektahin ng Learning Center sa araw ng personal na pagpapasa ng mga dokumento.
               </div>
               <div class="sig-row">
-                <div class="form-row"><label>Buong Pangalan ng Aplikante <span class="req">*</span></label><input type="text" id="signerName" required /></div>
+                <div class="form-row"><label>Buong Pangalan ng Aplikante <span class="req">*</span></label><input type="text" id="signerName" class="only-letters" required /></div>
                 <div class="form-row"><label>Petsa</label><input type="date" id="signDate" /></div>
               </div>
               <div class="form-row-split">
@@ -1415,7 +1415,7 @@ footer {
               <div class="requirement-item"><input type="checkbox" id="req7" /><label for="req7">4Ps Household ID <span class="opt-tag">(kung naaangkop)</span></label></div>
             </div>
 
-            <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center; margin-top:24px; background:var(--gold);">✏️ Isumite ang ALS Enrollment Form</button>
+            <button type="submit" id="mainSubmitBtn" class="btn btn-primary" style="width:100%; justify-content:center; margin-top:24px; background:var(--gold);">✏️ Isumite ang ALS Enrollment Form</button>
 
             <div class="form-success" id="formSuccess">
               <p id="successMainMessage" style="margin-bottom:0;">✅ Salamat! Natanggap na ang inyong ALS enrollment application. Susuriin ito ng aming ALS coordinator at aabisuhan kayo sa pamamagitan ng email o tawag.</p>
@@ -1436,6 +1436,20 @@ footer {
       </div>
     </div>
   </section>
+
+  <!-- ============================================================
+       CONFIRMATION MODAL — shown before actual submission
+  ============================================================ -->
+  <div id="confirmModalOverlay" style="display:none; position:fixed; inset:0; background:rgba(27,67,50,0.55); z-index:9999; align-items:center; justify-content:center; padding:20px;">
+    <div style="background:#fff; border-radius:14px; padding:32px; max-width:440px; width:100%; box-shadow:0 12px 48px rgba(0,0,0,0.3);">
+      <h3 style="color:var(--green-dark); margin-bottom:12px; font-family:'Playfair Display', serif; font-size:1.3rem;">Kumpirmahin ang Pagsumite</h3>
+      <p style="color:var(--text-muted); font-size:0.92rem; margin-bottom:24px; line-height:1.6;">Pakisuri muna nang mabuti ang lahat ng inyong nailagay na impormasyon bago isumite. Hindi na ito maaaring baguhin pagkatapos i-submit. Sigurado ka na ba?</p>
+      <div style="display:flex; gap:12px; justify-content:flex-end; flex-wrap:wrap;">
+        <button type="button" class="btn btn-outline" style="border-color:var(--green-mid); color:var(--green-dark);" onclick="closeConfirmModal()">⬅️ Balikan at Suriin</button>
+        <button type="button" class="btn btn-primary" style="color:var(--green-dark);" id="confirmSubmitBtn">✅ Oo, Isumite Na</button>
+      </div>
+    </div>
+  </div>
 
   <div id="footer-root"></div>
 
@@ -1532,6 +1546,18 @@ function initSite(activePage) {
 
     let lastSummary = '';
 
+    // Reusable input restrictions: letters-only (names/places) and numbers-only (IDs/phones)
+    document.querySelectorAll('.only-letters').forEach(el => {
+      el.addEventListener('input', function () {
+        this.value = this.value.replace(/[^a-zA-ZñÑ\s.'-]/g, '');
+      });
+    });
+    document.querySelectorAll('.only-numbers').forEach(el => {
+      el.addEventListener('input', function () {
+        this.value = this.value.replace(/\D/g, '');
+      });
+    });
+
     // Phone number: digits only, max 11
     document.getElementById('contactNumber').addEventListener('input', function () {
       this.value = this.value.replace(/\D/g, '').slice(0, 11);
@@ -1539,6 +1565,21 @@ function initSite(activePage) {
 
     document.getElementById('alsForm').addEventListener('submit', function (e) {
       e.preventDefault();
+      if (!this.checkValidity()) { this.reportValidity(); return; }
+      document.getElementById('confirmModalOverlay').style.display = 'flex';
+    });
+
+    function closeConfirmModal() {
+      document.getElementById('confirmModalOverlay').style.display = 'none';
+    }
+
+    document.getElementById('confirmSubmitBtn').addEventListener('click', function () {
+      closeConfirmModal();
+      const submitBtn = document.getElementById('mainSubmitBtn');
+      submitBtn.disabled = true;
+      submitBtn.style.opacity = '0.5';
+      submitBtn.style.cursor = 'not-allowed';
+      submitBtn.textContent = '✅ Naisumite Na';
 
       const v = id => (document.getElementById(id)?.value || '').trim();
       const radio = name => (document.querySelector(`input[name="${name}"]:checked`)?.value || '-');
@@ -1606,6 +1647,8 @@ function initSite(activePage) {
           document.getElementById('req1')?.checked ? 1 : null,
           document.getElementById('req4')?.checked ? 4 : null,
           document.getElementById('req5')?.checked ? 5 : null,
+          document.getElementById('req6')?.checked ? 6 : null,
+          document.getElementById('req7')?.checked ? 7 : null,
         ].filter(x => x !== null)
       });
     });
