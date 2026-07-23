@@ -1649,7 +1649,54 @@ function initSite(activePage) {
           document.getElementById('req5')?.checked ? 5 : null,
           document.getElementById('req6')?.checked ? 6 : null,
           document.getElementById('req7')?.checked ? 7 : null,
-        ].filter(x => x !== null)
+        ].filter(x => x !== null),
+
+        lrn: v('lrn'),
+        middle_name: v('middleName'),
+        ext_name: v('extName'),
+        current_street: v('street'),
+        current_barangay: v('barangay'),
+        current_municipality: v('municipality'),
+        current_province: v('province'),
+        birthdate: v('birthdate') || null,
+        sex: radio('sex'),
+        civil_status: v('civilStatus'),
+        pwd: radio('pwd'),
+        religion: v('religion'),
+        mother_tongue: v('motherTongue'),
+        ip_group: v('ipGroup'),
+
+        father_last_name: v('fatherLast'),
+        father_first_name: v('fatherFirst'),
+        father_occupation: v('fatherOccupation'),
+        mother_last_name: v('motherLast'),
+        mother_first_name: v('motherFirst'),
+        mother_occupation: v('motherOccupation'),
+
+        last_grade: v('lastGrade'),
+        dropout_reason: checks('dropoutReason'),
+        dropout_other: v('dropoutOther'),
+        als_before: radio('alsBefore'),
+        als_program_name: v('alsProgramName'),
+        als_year_attended: v('alsYearAttended'),
+        als_completed: radio('alsCompleted'),
+        als_not_completed_reason: v('alsNotCompletedReason'),
+        distance_km: v('distanceKm'),
+        travel_hours: v('travelHours'),
+        travel_mins: v('travelMins'),
+        travel_mode: radio('travelMode'),
+        travel_other: v('travelOther'),
+        als_availability_schedule: {
+          monday: { from: v('sched_monday_from'), to: v('sched_monday_to') },
+          tuesday: { from: v('sched_tuesday_from'), to: v('sched_tuesday_to') },
+          wednesday: { from: v('sched_wednesday_from'), to: v('sched_wednesday_to') },
+          thursday: { from: v('sched_thursday_from'), to: v('sched_thursday_to') },
+          friday: { from: v('sched_friday_from'), to: v('sched_friday_to') },
+          saturday: { from: v('sched_saturday_from'), to: v('sched_saturday_to') },
+          sunday: { from: v('sched_sunday_from'), to: v('sched_sunday_to') }
+        },
+        signer_name: v('signerName'),
+        sign_date: v('signDate') || null
       });
     });
 
