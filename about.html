@@ -6,6 +6,9 @@
   <title>Tungkol Sa Amin — Tiu Cho Teg - Ana Ros Foundation Integrated Farm School</title>
   <link rel="icon" type="image/png" href="assets/logo.png" />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.css" />
+  <link rel="stylesheet" href="https://unpkg.com/mapillary-js@4/dist/mapillary.css" />
   <style>
 /* ============================================================
    TOKENS
@@ -723,6 +726,412 @@ nav {
   font-weight: 600;
 }
 
+/* ---- Route Finder ---- */
+.route-finder {
+  max-width: 1000px;
+  margin: 28px auto 0;
+  background: var(--white);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  padding: 24px 28px;
+}
+
+.route-finder h3 {
+  color: var(--green-dark);
+  font-size: 1.05rem;
+  margin-bottom: 4px;
+}
+
+.route-finder .form-note {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+
+.route-finder-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.route-finder-input {
+  flex: 1 1 280px;
+}
+
+.route-finder-input label {
+  display: block;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--green-dark);
+  margin-bottom: 6px;
+}
+
+.route-finder-input input {
+  width: 100%;
+  padding: 11px 14px;
+  border: 1.5px solid #D0E4D8;
+  border-radius: var(--radius);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  color: var(--text);
+  background: var(--white);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.route-finder-input input:focus { border-color: var(--green-mid); }
+
+.route-finder-input {
+  position: relative;
+}
+
+.route-suggestions {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin-top: 4px;
+  background: var(--white);
+  border: 1.5px solid #D0E4D8;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  max-height: 260px;
+  overflow-y: auto;
+  z-index: 50;
+}
+
+.route-suggestions.show { display: block; }
+
+.route-suggestion-item {
+  padding: 10px 14px;
+  font-size: 0.85rem;
+  color: var(--text);
+  cursor: pointer;
+  border-bottom: 1px solid #EEF4EF;
+}
+
+.route-suggestion-item:last-child { border-bottom: none; }
+
+.route-suggestion-item:hover,
+.route-suggestion-item.active {
+  background: var(--green-light);
+  color: var(--green-dark);
+}
+
+.route-suggestion-empty {
+  padding: 10px 14px;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.route-finder-btn {
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.route-finder-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.route-finder-btn.full-width {
+  width: 100%;
+  justify-content: center;
+  margin-top: 4px;
+}
+
+/* Mode tabs (I-type ang Address / I-pin sa Mapa) */
+.route-mode-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.route-mode-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1.5px solid #D0E4D8;
+  background: var(--white);
+  color: var(--text-muted);
+  font-family: 'Inter', sans-serif;
+  font-size: 0.83rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.route-mode-tab:hover { border-color: var(--green-mid); color: var(--green-dark); }
+
+.route-mode-tab.active {
+  background: var(--green-mid);
+  border-color: var(--green-mid);
+  color: var(--white);
+}
+
+/* Pin-on-map mode */
+.route-pin-row { margin-bottom: 14px; }
+
+.pin-instructions {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+.pin-status-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  background: var(--bg);
+  border: 1.5px solid #D0E4D8;
+  border-radius: var(--radius);
+  padding: 12px 14px;
+}
+
+.pin-status-box.has-pin { border-color: var(--green-mid); background: var(--green-light); }
+
+.pin-status-text {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
+.pin-status-text.set {
+  color: var(--green-dark);
+  font-weight: 600;
+  font-style: normal;
+}
+
+.pin-locate-btn {
+  flex-shrink: 0;
+  padding: 8px 16px;
+  font-size: 0.8rem;
+  white-space: nowrap;
+  background: var(--white) !important;
+  color: var(--green-dark) !important;
+  border: 1.5px solid var(--green-mid);
+}
+
+.pin-locate-btn:hover {
+  background: var(--green-mid) !important;
+  color: var(--white) !important;
+}
+
+.pin-locate-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.route-status {
+  margin-top: 12px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.route-status.error { color: #B00020; }
+
+.route-modes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 20px;
+}
+
+@media (max-width: 640px) {
+  .route-modes { grid-template-columns: 1fr; }
+}
+
+.route-mode-card {
+  background: var(--bg);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+  text-align: center;
+  border: 1.5px solid #D0E4D8;
+}
+
+.route-mode-card .mode-label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--green-mid);
+  margin-bottom: 8px;
+}
+
+.route-mode-card .mode-time {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.4rem;
+  color: var(--green-dark);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.route-mode-card .mode-distance {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.route-map-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 1000px;
+  margin: 0 auto;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  height: 460px;
+}
+
+#schoolMap {
+  width: 100%;
+  height: 100%;
+}
+
+/* "View Along Route" street-level viewer */
+.streetview-launch-row {
+  text-align: center;
+  margin-top: 16px;
+}
+
+.streetview-launch-btn {
+  font-size: 0.85rem;
+  padding: 10px 22px;
+}
+
+.streetview-note {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 8px;
+  font-style: italic;
+}
+
+.streetview-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(15,42,30,0.88);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.streetview-overlay.show { display: flex; }
+
+.streetview-panel {
+  background: var(--green-deep);
+  border-radius: 16px;
+  width: 100%;
+  max-width: 920px;
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+}
+
+.streetview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px;
+  color: var(--white);
+}
+
+.streetview-header h4 {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.streetview-close {
+  background: transparent;
+  border: none;
+  color: rgba(255,255,255,0.75);
+  font-size: 1.3rem;
+  line-height: 1;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+.streetview-close:hover { color: var(--white); }
+
+.streetview-address {
+  padding: 8px 18px;
+  background: var(--green-deep);
+  color: rgba(255,255,255,0.82);
+  font-size: 0.78rem;
+  border-top: 1px solid rgba(255,255,255,0.08);
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.streetview-viewer-wrap {
+  position: relative;
+  width: 100%;
+  height: 420px;
+  background: #000;
+}
+
+#mapillaryViewer { width: 100%; height: 100%; }
+
+.streetview-status {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--white);
+  font-size: 0.85rem;
+  text-align: center;
+  padding: 24px;
+  background: var(--green-deep);
+}
+
+.streetview-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 18px;
+  background: var(--green-dark);
+}
+
+.streetview-nav-btn {
+  background: var(--green-mid);
+  color: var(--white);
+  border: none;
+  border-radius: 20px;
+  padding: 8px 18px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.streetview-nav-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.streetview-step-label {
+  color: rgba(255,255,255,0.8);
+  font-size: 0.78rem;
+}
+
+.route-disclaimer {
+  text-align: center;
+  margin-top: 14px;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-style: italic;
+}
+
 /* ============================================================
    FAQ SECTION
 ============================================================ */
@@ -1390,20 +1799,89 @@ footer {
         <p class="section-label">Saan Kami Matatagpuan</p>
         <h2 class="section-title">Lokasyon ng Paaralan</h2>
       </div>
-      <div class="map-embed-wrapper">
-        <iframe
-          src="https://www.google.com/maps?q=10.772294,122.5708164&z=17&output=embed"
-          title="School Location Map"
-          loading="lazy"
-          allowfullscreen>
-        </iframe>
+
+      <div class="route-map-wrapper">
+        <div id="schoolMap"></div>
       </div>
       <p class="map-caption">
         Iloilo Radial By-Pass Rd 4, Lanit, Jaro, Iloilo City &nbsp;·&nbsp;
         <a href="https://maps.google.com/?cid=18264349933014790556" target="_blank" rel="noopener">Buksan sa Google Maps →</a>
       </p>
+
+      <div class="route-finder">
+        <h3>Hanapin ang Ruta Papunta sa Paaralan</h3>
+        <p class="form-note">I-type ang inyong address, o i-pin ang eksaktong lokasyon sa mapa sa itaas.</p>
+
+        <div class="route-mode-tabs">
+          <button type="button" class="route-mode-tab active" id="tabAddressMode" onclick="switchInputMode('address')">📍 I-type ang Address</button>
+          <button type="button" class="route-mode-tab" id="tabPinMode" onclick="switchInputMode('pin')">🗺️ I-pin sa Mapa</button>
+        </div>
+
+        <div class="route-finder-row" id="addressModeRow">
+          <div class="route-finder-input">
+            <label for="routeAddressInput">Inyong Address</label>
+            <input type="text" id="routeAddressInput" placeholder="hal. Barangay Buhang, Jaro, Iloilo City" autocomplete="off" />
+            <div class="route-suggestions" id="routeSuggestions"></div>
+          </div>
+        </div>
+
+        <div class="route-pin-row" id="pinModeRow" style="display:none;">
+          <p class="pin-instructions">I-click ang mapa sa itaas upang markahan ang inyong lokasyon (o i-drag ang pin para i-ayos), o gamitin na lang ang kasalukuyan ninyong lokasyon.</p>
+          <div class="pin-status-box" id="pinStatusBox">
+            <span class="pin-status-text" id="pinStatusText">Wala pang napiling lokasyon sa mapa.</span>
+            <button type="button" class="btn pin-locate-btn" id="useMyLocationBtn" onclick="useMyLocation()">📡 Gamitin ang Kasalukuyang Lokasyon Ko</button>
+          </div>
+        </div>
+
+        <button type="button" class="btn btn-primary route-finder-btn full-width" id="routeFinderBtn" onclick="findRoute()">Hanapin ang Ruta</button>
+
+        <p class="route-status" id="routeStatus"></p>
+
+        <div class="route-modes" id="routeModes" style="display:none;">
+          <div class="route-mode-card">
+            <div class="mode-label">Kotse</div>
+            <div class="mode-time" id="modeCarTime">–</div>
+            <div class="mode-distance" id="modeCarDistance">–</div>
+          </div>
+          <div class="route-mode-card">
+            <div class="mode-label">Motorsiklo</div>
+            <div class="mode-time" id="modeMotoTime">–</div>
+            <div class="mode-distance" id="modeMotoDistance">–</div>
+          </div>
+          <div class="route-mode-card">
+            <div class="mode-label">Lakad</div>
+            <div class="mode-time" id="modeWalkTime">–</div>
+            <div class="mode-distance" id="modeWalkDistance">–</div>
+          </div>
+        </div>
+        <p class="route-disclaimer" id="routeDisclaimer" style="display:none;">Tinatayang oras lamang batay sa ruta ng kalsada, hindi kasama ang trapiko o kondisyon ng lansangan.</p>
+
+        <div class="streetview-launch-row" id="streetviewLaunchRow" style="display:none;">
+          <button type="button" class="btn btn-outline streetview-launch-btn" style="color:var(--green-dark); border-color:var(--green-mid);" onclick="openStreetView()">🧭 Tingnan ang Ruta sa Street-Level na Larawan</button>
+          <p class="streetview-note">Makikita lang dito ang mga larawan sa daan papunta sa paaralan — hindi ito malayang paggalaw sa buong lungsod.</p>
+        </div>
+      </div>
     </div>
   </section>
+
+  <div class="streetview-overlay" id="streetviewOverlay">
+    <div class="streetview-panel">
+      <div class="streetview-header">
+        <h4>Ruta Papunta sa Paaralan — Street-Level na Larawan</h4>
+        <button type="button" class="streetview-close" onclick="closeStreetView()" aria-label="Isara">✕</button>
+      </div>
+      <p class="streetview-address" id="streetviewAddress"></p>
+      <div class="streetview-viewer-wrap">
+        <div id="mapillaryViewer"></div>
+        <div class="streetview-status" id="streetviewStatus">Naghahanap ng mga larawan sa ruta...</div>
+      </div>
+      <div class="streetview-controls">
+        <button type="button" class="streetview-nav-btn" id="streetviewPrevBtn" onclick="stepStreetView(-1)" disabled>← Nakaraan</button>
+        <span class="streetview-step-label" id="streetviewStepLabel"></span>
+        <button type="button" class="streetview-nav-btn" id="streetviewNextBtn" onclick="stepStreetView(1)" disabled>Susunod →</button>
+      </div>
+    </div>
+  </div>
 
   <div id="footer-root"></div>
 
@@ -1554,6 +2032,650 @@ window.addEventListener('DOMContentLoaded', () => {
   highlightTargetSection();
 });
 window.addEventListener('hashchange', highlightTargetSection);
+  </script>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet-routing-machine@3.2.12/dist/leaflet-routing-machine.js"></script>
+  <script src="https://unpkg.com/mapillary-js@4/dist/mapillary.js"></script>
+  <script>
+/* ============================================================
+   SCHOOL LOCATION MAP + ROUTE FINDER
+   Uses Leaflet (OpenStreetMap tiles) + OSRM public routing
+   server (driving profile) + Nominatim for address geocoding.
+   No API key required. Walking and motorcycle times are
+   estimated from the driven route's distance using typical
+   average speeds, since the free routing server only serves
+   driving directions.
+============================================================ */
+
+const SCHOOL_COORDS = [10.772294, 122.5708164];
+const SCHOOL_NAME = "Tiu Cho Teg - Ana Ros Foundation Integrated Farm School";
+
+// Free Mapillary client access token — get your own at
+// https://www.mapillary.com/dashboard/developers (Register application →
+// copy the "Client Token", it starts with "MLY|"). No billing account needed.
+// This token is visible in the page source once deployed, which is expected
+// for Mapillary's client-side SDK — just don't mix it up with a private key.
+const MAPILLARY_ACCESS_TOKEN = 'MLY|38289781417279651|598b52dda2d610d894b8647a563ca2a8';
+
+let schoolMap, routeControl, schoolMarker, originMarker, pinOriginMarker;
+let selectedOrigin = null;
+let inputMode = 'address'; // 'address' or 'pin'
+let pinnedOrigin = null;   // { lat, lon, label } set by clicking/dragging on the map
+let suggestionDebounceTimer = null;
+let lastRouteLatLngs = null;   // coordinates of the most recently calculated route
+let mapillaryViewer = null;
+let routeStreetViewImages = []; // ordered list of { id, lat, lon } found along the route
+let currentStreetViewIndex = -1;
+let activeSuggestionIndex = -1;
+let currentSuggestions = [];
+
+// Rough bounding box around Iloilo / Panay area, used to bias (not restrict)
+// search results toward places nearby, since most applicants will be local.
+const ILOILO_VIEWBOX = '121.9,11.3,123.3,10.0'; // left,top,right,bottom
+
+function initSchoolMap() {
+  schoolMap = L.map('schoolMap').setView(SCHOOL_COORDS, 15);
+
+  const streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  }).addTo(schoolMap);
+
+  const terrainLayer = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+    maxZoom: 17,
+    attribution: 'Map data: &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, SRTM | Map style: &copy; <a href="https://opentopomap.org">OpenTopoMap</a> (CC-BY-SA)'
+  });
+
+  L.control.layers({
+    'Street': streetLayer,
+    'Terrain': terrainLayer
+  }, null, { position: 'topright' }).addTo(schoolMap);
+
+  schoolMarker = L.marker(SCHOOL_COORDS).addTo(schoolMap)
+    .bindPopup(SCHOOL_NAME)
+    .openPopup();
+
+  // Clicking the map only drops/moves a pin while in "pin" mode, so it
+  // doesn't interfere with normal map panning/zooming while typing an address.
+  schoolMap.on('click', function (e) {
+    if (inputMode !== 'pin') return;
+    setPinLocation(e.latlng.lat, e.latlng.lng);
+  });
+}
+
+function setPinLocation(lat, lon) {
+  if (pinOriginMarker) {
+    pinOriginMarker.setLatLng([lat, lon]);
+  } else {
+    pinOriginMarker = L.marker([lat, lon], { draggable: true }).addTo(schoolMap);
+    pinOriginMarker.on('dragend', function () {
+      const pos = pinOriginMarker.getLatLng();
+      setPinLocation(pos.lat, pos.lng);
+    });
+  }
+  pinOriginMarker.bindPopup('Inyong Pinned na Lokasyon').openPopup();
+
+  pinnedOrigin = { lat, lon, label: 'Naka-pin na lokasyon sa mapa' };
+  setPinStatus('Naka-set na ang pin sa lat ' + lat.toFixed(5) + ', lon ' + lon.toFixed(5) + '.', true);
+
+  // Reverse-geocode in the background just to show a friendlier label;
+  // the coordinates themselves are already usable for routing either way.
+  reverseGeocode(lat, lon).then(label => {
+    if (!label || !pinnedOrigin || pinnedOrigin.lat !== lat || pinnedOrigin.lon !== lon) return;
+    pinnedOrigin.label = label;
+    setPinStatus('Napiling lokasyon: ' + label, true);
+  }).catch(() => {});
+}
+
+async function reverseGeocode(lat, lon) {
+  const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`;
+  const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+  if (!res.ok) return null;
+  const data = await res.json();
+  return data && data.display_name ? data.display_name : null;
+}
+
+function setPinStatus(message, hasPin) {
+  const text = document.getElementById('pinStatusText');
+  const box = document.getElementById('pinStatusBox');
+  text.textContent = message;
+  text.classList.toggle('set', !!hasPin);
+  box.classList.toggle('has-pin', !!hasPin);
+}
+
+function switchInputMode(mode) {
+  if (mode === inputMode) return; // no-op if clicking the already-active tab
+  inputMode = mode;
+  document.getElementById('tabAddressMode').classList.toggle('active', mode === 'address');
+  document.getElementById('tabPinMode').classList.toggle('active', mode === 'pin');
+  document.getElementById('addressModeRow').style.display = mode === 'address' ? 'flex' : 'none';
+  document.getElementById('pinModeRow').style.display = mode === 'pin' ? 'block' : 'none';
+  if (mode === 'address') hideSuggestions();
+  resetRouteState();
+}
+
+// Clears any calculated route, distance/duration cards, and origin markers,
+// and returns the map to its default view. Called whenever the person
+// switches between "type address" and "pin on map" modes, since a route
+// or pin from one mode shouldn't carry over and look valid in the other.
+function resetRouteState() {
+  if (routeControl) {
+    schoolMap.removeControl(routeControl);
+    routeControl = null;
+  }
+  if (originMarker) {
+    schoolMap.removeLayer(originMarker);
+    originMarker = null;
+  }
+  if (pinOriginMarker) {
+    schoolMap.removeLayer(pinOriginMarker);
+    pinOriginMarker = null;
+  }
+
+  selectedOrigin = null;
+  pinnedOrigin = null;
+
+  document.getElementById('routeAddressInput').value = '';
+  document.getElementById('routeModes').style.display = 'none';
+  document.getElementById('routeDisclaimer').style.display = 'none';
+  document.getElementById('streetviewLaunchRow').style.display = 'none';
+  setRouteStatus('', false);
+  setPinStatus('Wala pang napiling lokasyon sa mapa.', false);
+
+  lastRouteLatLngs = null;
+  closeStreetView();
+
+  schoolMap.setView(SCHOOL_COORDS, 15);
+}
+
+function useMyLocation() {
+  if (!navigator.geolocation) {
+    setPinStatus('Hindi suportado ng browser na ito ang paghanap ng lokasyon.', false);
+    return;
+  }
+  const btn = document.getElementById('useMyLocationBtn');
+  btn.disabled = true;
+  const originalText = btn.textContent;
+  btn.textContent = 'Hinahanap ang lokasyon...';
+
+  navigator.geolocation.getCurrentPosition(
+    function (pos) {
+      const { latitude, longitude } = pos.coords;
+      schoolMap.setView([latitude, longitude], 15);
+      setPinLocation(latitude, longitude);
+      btn.disabled = false;
+      btn.textContent = originalText;
+    },
+    function () {
+      setPinStatus('Hindi makuha ang inyong kasalukuyang lokasyon. Subukan i-click na lang ang mapa.', false);
+      btn.disabled = false;
+      btn.textContent = originalText;
+    },
+    { enableHighAccuracy: true, timeout: 10000 }
+  );
+}
+
+function setRouteStatus(message, isError) {
+  const el = document.getElementById('routeStatus');
+  el.textContent = message || '';
+  el.classList.toggle('error', !!isError);
+}
+
+function formatDuration(seconds) {
+  const totalMinutes = Math.round(seconds / 60);
+  if (totalMinutes < 60) return `${totalMinutes} min`;
+  const hours = Math.floor(totalMinutes / 60);
+  const mins = totalMinutes % 60;
+  return mins > 0 ? `${hours} hr ${mins} min` : `${hours} hr`;
+}
+
+function formatDistance(meters) {
+  return `${(meters / 1000).toFixed(1)} km`;
+}
+
+// Generates progressively simpler versions of an address to retry with,
+// since Nominatim's PH coverage often can't resolve fine-grained detail
+// like "Zone 3" but can resolve the barangay/city it sits in.
+function generateAddressFallbacks(query) {
+  const variants = [query];
+
+  const zoneStripped = query.replace(/^\s*(zone|purok|block|lot|sitio|phase)\s*\S*\s*,\s*/i, '');
+  if (zoneStripped !== query) variants.push(zoneStripped);
+
+  const segments = query.split(',').map(s => s.trim()).filter(Boolean);
+  if (segments.length > 2) variants.push(segments.slice(1).join(', '));   // drop first segment
+  if (segments.length > 3) variants.push(segments.slice(-3).join(', ')); // keep last 3
+  if (segments.length > 2) variants.push(segments.slice(-2).join(', ')); // keep last 2
+
+  return [...new Set(variants)];
+}
+
+async function geocodeAddress(query) {
+  for (const variant of generateAddressFallbacks(query)) {
+    const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=ph&q=${encodeURIComponent(variant)}`;
+    const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+    if (!res.ok) continue;
+    const results = await res.json();
+    if (results.length) {
+      return {
+        lat: parseFloat(results[0].lat),
+        lon: parseFloat(results[0].lon),
+        label: results[0].display_name,
+        approximate: variant !== query
+      };
+    }
+  }
+  return null;
+}
+
+async function fetchSuggestions(query) {
+  for (const variant of generateAddressFallbacks(query)) {
+    const url = `https://nominatim.openstreetmap.org/search?format=json&limit=6&countrycodes=ph&viewbox=${ILOILO_VIEWBOX}&bounded=0&q=${encodeURIComponent(variant)}`;
+    const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
+    if (!res.ok) continue;
+    const results = await res.json();
+    if (results.length) return { results, approximate: variant !== query };
+  }
+  return { results: [], approximate: false };
+}
+
+function renderSuggestions(results, approximate) {
+  const box = document.getElementById('routeSuggestions');
+  currentSuggestions = results;
+  activeSuggestionIndex = -1;
+
+  if (!results.length) {
+    box.innerHTML = '<div class="route-suggestion-empty">Walang nahanap na tugmang lokasyon. Subukan ang mas detalyadong address.</div>';
+    box.classList.add('show');
+    return;
+  }
+
+  const note = approximate
+    ? '<div class="route-suggestion-empty">Hindi eksaktong tugma &#8212; ito ang pinakamalapit na nahanap:</div>'
+    : '';
+
+  box.innerHTML = note + results.map((r, i) =>
+    `<div class="route-suggestion-item" data-idx="${i}">${r.display_name}</div>`
+  ).join('');
+  box.classList.add('show');
+
+  box.querySelectorAll('.route-suggestion-item').forEach(item => {
+    item.addEventListener('click', function () {
+      selectSuggestion(parseInt(this.dataset.idx, 10));
+    });
+  });
+}
+
+function hideSuggestions() {
+  const box = document.getElementById('routeSuggestions');
+  box.classList.remove('show');
+  box.innerHTML = '';
+}
+
+function selectSuggestion(idx) {
+  const r = currentSuggestions[idx];
+  if (!r) return;
+  const input = document.getElementById('routeAddressInput');
+  input.value = r.display_name;
+  selectedOrigin = { lat: parseFloat(r.lat), lon: parseFloat(r.lon), label: r.display_name };
+  hideSuggestions();
+}
+
+document.getElementById('routeAddressInput').addEventListener('input', function () {
+  const query = this.value.trim();
+  selectedOrigin = null; // typing invalidates any previously picked suggestion
+  clearTimeout(suggestionDebounceTimer);
+
+  if (query.length < 3) {
+    hideSuggestions();
+    return;
+  }
+
+  suggestionDebounceTimer = setTimeout(async () => {
+    try {
+      const { results, approximate } = await fetchSuggestions(query);
+      renderSuggestions(results, approximate);
+    } catch (e) {
+      console.error(e);
+    }
+  }, 400);
+});
+
+document.getElementById('routeAddressInput').addEventListener('keydown', function (e) {
+  const box = document.getElementById('routeSuggestions');
+  const items = box.querySelectorAll('.route-suggestion-item');
+
+  if (e.key === 'ArrowDown' && items.length) {
+    e.preventDefault();
+    activeSuggestionIndex = Math.min(activeSuggestionIndex + 1, items.length - 1);
+    items.forEach((el, i) => el.classList.toggle('active', i === activeSuggestionIndex));
+    items[activeSuggestionIndex].scrollIntoView({ block: 'nearest' });
+  } else if (e.key === 'ArrowUp' && items.length) {
+    e.preventDefault();
+    activeSuggestionIndex = Math.max(activeSuggestionIndex - 1, 0);
+    items.forEach((el, i) => el.classList.toggle('active', i === activeSuggestionIndex));
+    items[activeSuggestionIndex].scrollIntoView({ block: 'nearest' });
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    if (activeSuggestionIndex >= 0 && items.length) {
+      selectSuggestion(activeSuggestionIndex);
+    } else {
+      findRoute();
+    }
+  } else if (e.key === 'Escape') {
+    hideSuggestions();
+  }
+});
+
+document.addEventListener('click', function (e) {
+  const wrapper = document.querySelector('.route-finder-input');
+  if (wrapper && !wrapper.contains(e.target)) hideSuggestions();
+});
+
+async function findRoute() {
+  const input = document.getElementById('routeAddressInput');
+  const btn = document.getElementById('routeFinderBtn');
+  const address = input.value.trim();
+
+  if (inputMode === 'pin' && !pinnedOrigin) {
+    setPinStatus('Mangyaring mag-pin muna ng lokasyon sa mapa, o gamitin ang kasalukuyan ninyong lokasyon.', false);
+    return;
+  }
+  if (inputMode === 'address' && !address) {
+    setRouteStatus('Mangyaring i-type muna ang inyong address.', true);
+    return;
+  }
+
+  btn.disabled = true;
+  btn.textContent = 'Hinahanap...';
+  setRouteStatus(inputMode === 'pin' ? 'Kinakalkula ang ruta mula sa naka-pin na lokasyon...' : 'Hinahanap ang lokasyon...', false);
+  document.getElementById('routeModes').style.display = 'none';
+  document.getElementById('routeDisclaimer').style.display = 'none';
+  document.getElementById('streetviewLaunchRow').style.display = 'none';
+  hideSuggestions();
+
+  try {
+    const origin = inputMode === 'pin'
+      ? pinnedOrigin
+      : (selectedOrigin || await geocodeAddress(address));
+
+    if (!origin) {
+      setRouteStatus('Hindi nahanap ang address na iyon. Pumili ng mungkahing lokasyon mula sa listahan, o gumamit ng mas detalyadong address.', true);
+      return;
+    }
+
+    setRouteStatus('Kinakalkula ang ruta...', false);
+
+    const originLabel = inputMode === 'pin' ? (origin.label || 'Naka-pin na lokasyon') : address;
+
+    if (originMarker) schoolMap.removeLayer(originMarker);
+    // In pin mode the draggable pin marker already marks the start point,
+    // so we don't add a second overlapping marker for it.
+    if (inputMode === 'address') {
+      originMarker = L.marker([origin.lat, origin.lon]).addTo(schoolMap)
+        .bindPopup('Simula: ' + originLabel);
+    }
+
+    if (routeControl) {
+      schoolMap.removeControl(routeControl);
+      routeControl = null;
+    }
+
+    routeControl = L.Routing.control({
+      waypoints: [
+        L.latLng(origin.lat, origin.lon),
+        L.latLng(SCHOOL_COORDS[0], SCHOOL_COORDS[1])
+      ],
+      router: L.Routing.osrmv1({ serviceUrl: 'https://router.project-osrm.org/route/v1', profile: 'driving' }),
+      lineOptions: { styles: [{ color: '#40916C', weight: 5, opacity: 0.85 }] },
+      addWaypoints: false,
+      draggableWaypoints: false,
+      fitSelectedRoutes: true,
+      show: false,
+      createMarker: function () { return null; } // we already place our own markers
+    }).addTo(schoolMap);
+
+    routeControl.on('routesfound', function (e) {
+      const route = e.routes[0];
+      const distanceMeters = route.summary.totalDistance;
+      const carSeconds = route.summary.totalTime;
+
+      // Estimate other modes from the same route distance using
+      // typical average speeds (no live routing available for these
+      // profiles on the free public server).
+      const motoSeconds = (distanceMeters / 1000) / 35 * 3600;   // ~35 km/h avg
+      const walkSeconds = (distanceMeters / 1000) / 5 * 3600;    // ~5 km/h avg
+
+      document.getElementById('modeCarTime').textContent = formatDuration(carSeconds);
+      document.getElementById('modeCarDistance').textContent = formatDistance(distanceMeters);
+      document.getElementById('modeMotoTime').textContent = formatDuration(motoSeconds);
+      document.getElementById('modeMotoDistance').textContent = formatDistance(distanceMeters);
+      document.getElementById('modeWalkTime').textContent = formatDuration(walkSeconds);
+      document.getElementById('modeWalkDistance').textContent = formatDistance(distanceMeters);
+
+      document.getElementById('routeModes').style.display = 'grid';
+      document.getElementById('routeDisclaimer').style.display = 'block';
+      const successMsg = origin.approximate
+        ? 'Nahanap ang ruta papunta sa paaralan (tinatayang lokasyon batay sa barangay/lungsod, hindi eksaktong address).'
+        : 'Nahanap ang ruta papunta sa paaralan.';
+      setRouteStatus(successMsg, false);
+
+      lastRouteLatLngs = route.coordinates;
+      document.getElementById('streetviewLaunchRow').style.display = 'block';
+    });
+
+    routeControl.on('routingerror', function () {
+      setRouteStatus('Hindi makuha ang ruta sa kalsada papunta sa lokasyong iyon. Subukan ulit mamaya.', true);
+    });
+
+  } catch (err) {
+    console.error(err);
+    setRouteStatus('May problema sa paghahanap ng ruta. Subukan ulit.', true);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Hanapin ang Ruta';
+  }
+}
+
+// ============================================================
+// STREET-LEVEL VIEW ALONG THE ROUTE (Mapillary)
+// Shows real street-level photos, but ONLY at points sampled from the
+// calculated route — the viewer's own free-roam navigation (direction
+// arrows, sequence player, keyboard) is disabled, and we drive it
+// ourselves with Previous/Next buttons through our own fixed list.
+// ============================================================
+
+// Picks `count` evenly-spaced points along the route's coordinate list,
+// so a short walk and a long drive both get a reasonable number of stops.
+function sampleRouteCoordinates(latlngs, count) {
+  if (!latlngs || latlngs.length === 0) return [];
+  if (latlngs.length <= count) return latlngs.map(p => ({ lat: p.lat, lon: p.lng }));
+
+  const points = [];
+  const step = (latlngs.length - 1) / (count - 1);
+  for (let i = 0; i < count; i++) {
+    const p = latlngs[Math.round(i * step)];
+    points.push({ lat: p.lat, lon: p.lng });
+  }
+  return points;
+}
+
+// Looks up a Mapillary photo within `radius` meters of a point. When
+// several images are nearby, a full 360° panorama is preferred over a
+// regular forward-facing photo, since panoramas give the more immersive
+// "look around" feel; a directional photo is still used as a fallback
+// so coverage isn't reduced. Returns null if nothing is nearby at all.
+async function findNearestMapillaryImage(lat, lon, radius) {
+  const url = `https://graph.mapillary.com/images?access_token=${MAPILLARY_ACCESS_TOKEN}&fields=id,geometry,is_pano&lat=${lat}&lng=${lon}&radius=${radius}&limit=5`;
+  const res = await fetch(url);
+  if (!res.ok) return null;
+  const data = await res.json();
+  if (!data.data || !data.data.length) return null;
+
+  const panorama = data.data.find(img => img.is_pano);
+  const img = panorama || data.data[0];
+
+  return {
+    id: img.id,
+    lat: img.geometry.coordinates[1],
+    lon: img.geometry.coordinates[0],
+    isPano: !!img.is_pano
+  };
+}
+
+async function buildRouteImageSequence() {
+  const samplePoints = sampleRouteCoordinates(lastRouteLatLngs, 8);
+  const found = [];
+  const seenIds = new Set();
+
+  for (const point of samplePoints) {
+    try {
+      const img = await findNearestMapillaryImage(point.lat, point.lon, 40);
+      if (img && !seenIds.has(img.id)) {
+        seenIds.add(img.id);
+        found.push(img);
+      }
+    } catch (e) {
+      console.error('Mapillary lookup failed for point', point, e);
+    }
+  }
+  return found;
+}
+
+async function openStreetView() {
+  if (!lastRouteLatLngs) return;
+
+  if (MAPILLARY_ACCESS_TOKEN.indexOf('YOUR_CLIENT_TOKEN_HERE') !== -1) {
+    document.getElementById('streetviewOverlay').classList.add('show');
+    setStreetViewStatus('Kailangan munang i-set ang Mapillary access token sa code bago gumana ang feature na ito.');
+    return;
+  }
+
+  document.getElementById('streetviewOverlay').classList.add('show');
+  setStreetViewStatus('Naghahanap ng mga larawan sa ruta...');
+  document.getElementById('streetviewPrevBtn').disabled = true;
+  document.getElementById('streetviewNextBtn').disabled = true;
+  document.getElementById('streetviewStepLabel').textContent = '';
+
+  routeStreetViewImages = await buildRouteImageSequence();
+
+  if (!routeStreetViewImages.length) {
+    setStreetViewStatus('Walang available na larawan sa rutang ito sa ngayon. Ang mga larawan ay galing sa mga user, kaya maaaring wala pang saklaw ang ilang maliliit na kalye.');
+    return;
+  }
+
+  currentStreetViewIndex = 0;
+  initMapillaryViewer(routeStreetViewImages[0].id);
+}
+
+function initMapillaryViewer(startImageId) {
+  if (mapillaryViewer) {
+    mapillaryViewer.remove();
+    mapillaryViewer = null;
+  }
+
+  mapillaryViewer = new window.mapillary.Viewer({
+    accessToken: MAPILLARY_ACCESS_TOKEN,
+    container: 'mapillaryViewer',
+    imageId: startImageId,
+    component: {
+      // Disable Mapillary's own navigation so people can't roam off our
+      // route — we drive movement entirely through our Previous/Next buttons.
+      direction: false,
+      sequence: false,
+      keyboard: false,
+      cover: false
+    }
+  });
+
+  mapillaryViewer.on('load', function () {
+    setStreetViewStatus('');
+  });
+
+  updateStreetViewControls();
+}
+
+function setStreetViewStatus(message) {
+  const el = document.getElementById('streetviewStatus');
+  if (!message) {
+    el.style.display = 'none';
+  } else {
+    el.style.display = 'flex';
+    el.textContent = message;
+  }
+}
+
+function updateStreetViewControls() {
+  const total = routeStreetViewImages.length;
+  document.getElementById('streetviewPrevBtn').disabled = currentStreetViewIndex <= 0;
+  document.getElementById('streetviewNextBtn').disabled = currentStreetViewIndex >= total - 1;
+
+  if (!total) {
+    document.getElementById('streetviewStepLabel').textContent = '';
+    document.getElementById('streetviewAddress').textContent = '';
+    return;
+  }
+  const current = routeStreetViewImages[currentStreetViewIndex];
+  const panoBadge = current.isPano ? ' · 🔄 360°' : '';
+  document.getElementById('streetviewStepLabel').textContent = `Tigil ${currentStreetViewIndex + 1} ng ${total}${panoBadge}`;
+
+  updateStreetViewAddress();
+}
+
+// Reverse-geocodes the current stop's coordinates so people know exactly
+// where along the route the photo was taken. Result is cached on the
+// image entry itself so switching back and forth doesn't re-fetch it.
+async function updateStreetViewAddress() {
+  const current = routeStreetViewImages[currentStreetViewIndex];
+  const el = document.getElementById('streetviewAddress');
+  if (!current) {
+    el.textContent = '';
+    return;
+  }
+
+  if (current.address) {
+    el.textContent = '📍 ' + current.address;
+    return;
+  }
+
+  el.textContent = 'Hinahanap ang address ng lokasyong ito...';
+
+  let label = null;
+  try {
+    label = await reverseGeocode(current.lat, current.lon);
+  } catch (e) {
+    console.error(e);
+  }
+
+  current.address = label || 'Hindi matukoy ang eksaktong address ng lokasyong ito.';
+
+  // Guard against the person having already clicked to a different stop
+  // while this lookup was in flight.
+  if (routeStreetViewImages[currentStreetViewIndex] === current) {
+    el.textContent = '📍 ' + current.address;
+  }
+}
+
+function stepStreetView(direction) {
+  const nextIndex = currentStreetViewIndex + direction;
+  if (nextIndex < 0 || nextIndex >= routeStreetViewImages.length || !mapillaryViewer) return;
+  currentStreetViewIndex = nextIndex;
+  mapillaryViewer.moveTo(routeStreetViewImages[currentStreetViewIndex].id).catch(err => console.error(err));
+  updateStreetViewControls();
+}
+
+function closeStreetView() {
+  document.getElementById('streetviewOverlay').classList.remove('show');
+  if (mapillaryViewer) {
+    mapillaryViewer.remove();
+    mapillaryViewer = null;
+  }
+  routeStreetViewImages = [];
+  currentStreetViewIndex = -1;
+}
+
+window.addEventListener('DOMContentLoaded', initSchoolMap);
   </script>
 </body>
 </html>
