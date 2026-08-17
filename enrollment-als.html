@@ -905,6 +905,13 @@ footer {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
   gap: 14px;
+  align-items: end;
+}
+
+.form-row-triple .form-row label {
+  min-height: 2.1em;
+  display: flex;
+  align-items: flex-end;
 }
 
 @media (max-width: 640px) {
@@ -918,6 +925,21 @@ footer {
   color: var(--text-muted);
   font-weight: 400;
   margin-left: 6px;
+}
+
+.field-warning {
+  display: none;
+  font-size: 0.78rem;
+  color: #B00020;
+  margin-top: 6px;
+}
+
+.field-warning.show { display: block; }
+
+.form-row input.field-invalid,
+.form-row select.field-invalid {
+  border-color: #B00020 !important;
+  background: #FDEDEE;
 }
 
 /* ---- Radio / checkbox groups ---- */
@@ -1227,9 +1249,18 @@ footer {
 
               <div class="form-row"><label>House No. / Street / Sitio <span class="req">*</span></label><input type="text" id="street" required /></div>
               <div class="form-row-triple">
-                <div class="form-row"><label>Barangay <span class="req">*</span></label><input type="text" id="barangay" required /></div>
-                <div class="form-row"><label>Munisipyo/Lungsod <span class="req">*</span></label><input type="text" id="municipality" required /></div>
-                <div class="form-row"><label>Probinsya</label><input type="text" id="province" value="Iloilo" /></div>
+                <div class="form-row">
+                  <label>Probinsya <span class="req">*</span></label>
+                  <select id="province" required onchange="populateCities('province','municipality','barangay')"></select>
+                </div>
+                <div class="form-row">
+                  <label>Munisipyo/Lungsod <span class="req">*</span></label>
+                  <select id="municipality" required onchange="populateBarangays('province','municipality','barangay')"><option value="">Piliin muna ang probinsya</option></select>
+                </div>
+                <div class="form-row">
+                  <label>Barangay <span class="req">*</span></label>
+                  <select id="barangay" required><option value="">Piliin muna ang munisipyo/lungsod</option></select>
+                </div>
               </div>
 
               <div class="form-row-triple">
@@ -1237,8 +1268,8 @@ footer {
                 <div class="form-row">
                   <label>Kasarian (Sex) <span class="req">*</span></label>
                   <div class="choice-group">
-                    <label class="choice-pill"><input type="radio" name="sex" value="Male" required /> Lalaki</label>
-                    <label class="choice-pill"><input type="radio" name="sex" value="Female" /> Babae</label>
+                    <label class="choice-pill"><input type="radio" name="sex" value="Male" required /> Male</label>
+                    <label class="choice-pill"><input type="radio" name="sex" value="Female" /> Female</label>
                   </div>
                 </div>
                 <div class="form-row">
@@ -1260,7 +1291,19 @@ footer {
                   </div>
                 </div>
                 <div class="form-row"><label>Relihiyon</label><input type="text" id="religion" class="only-letters" /></div>
-                <div class="form-row"><label>Unang Wika (Mother Tongue)</label><input type="text" id="motherTongue" class="only-letters" /></div>
+                <div class="form-row">
+                  <label>Unang Wika (Mother Tongue)</label>
+                  <select id="motherTongue" onchange="toggleBlock('motherTongueOtherBlock', this.value === 'Others')">
+                    <option value="">Piliin...</option>
+                    <option value="English">English</option>
+                    <option value="Tagalog">Tagalog</option>
+                    <option value="Hiligaynon">Hiligaynon</option>
+                    <option value="Others">Others</option>
+                  </select>
+                  <div class="conditional-block" id="motherTongueOtherBlock" style="margin-top:8px; padding:0; background:none; border:none;">
+                    <input type="text" id="motherTongueOther" class="only-letters" placeholder="Itukoy ang wika" />
+                  </div>
+                </div>
               </div>
 
               <div class="form-row">
@@ -1395,18 +1438,19 @@ footer {
                 <div class="form-row"><label>Petsa</label><input type="date" id="signDate" /></div>
               </div>
               <div class="form-row-split">
-                <div class="form-row"><label>Contact Number para sa Follow-up <span class="req">*</span></label><input type="tel" id="contactNumber" maxlength="11" inputmode="numeric" pattern="[0-9]{11}" title="11 digits lang, halimbawa: 09171234567" required /></div>
+                <div class="form-row"><label>Contact Number para sa Follow-up <span class="req">*</span></label><input type="tel" id="contactNumber" class="phone-field" maxlength="11" inputmode="numeric" pattern="[0-9]{11}" title="11 digits lang, halimbawa: 09171234567" required /><p class="field-warning" id="contactNumber-warning"></p></div>
                 <div class="form-row">
                   <label>Email Address <span class="req">*</span></label>
-                  <input type="email" id="contactEmail" required />
-                  <p class="form-note">Gagamitin ito ng ALS coordinator para ipadala ang status ng inyong application.</p>
+                  <input type="email" id="contactEmail" class="email-field" required />
+                  <p class="field-warning" id="contactEmail-warning"></p>
+                  <p class="form-note">Gamitin ang tamang email extension (hal. gmail.com, yahoo.com). Ito ang gagamitin ng ALS coordinator para ipadala ang status ng inyong application.</p>
                 </div>
               </div>
             </div>
 
             <!-- REQUIREMENTS CHECKLIST -->
             <div class="requirements-panel">
-              <h3>&#128203; Requirements Checklist</h3>
+              <h3>Requirements Checklist</h3>
               <p class="form-note">I-check ang mga dokumentong nasa inyo na. Makikita ito ng aming ALS coordinator para malaman kung ano pa ang kailangang ihanda.</p>
               <div class="requirement-item"><input type="checkbox" id="req1" /><label for="req1">PSA Birth Certificate</label></div>
               <div class="requirement-item"><input type="checkbox" id="req4" /><label for="req4">Barangay Certificate <span class="opt-tag">(kung walang PSA Birth Certificate)</span></label></div>
@@ -1415,16 +1459,16 @@ footer {
               <div class="requirement-item"><input type="checkbox" id="req7" /><label for="req7">4Ps Household ID <span class="opt-tag">(kung naaangkop)</span></label></div>
             </div>
 
-            <button type="submit" id="mainSubmitBtn" class="btn btn-primary" style="width:100%; justify-content:center; margin-top:24px; background:var(--gold);">&#9999;&#65039; Isumite ang ALS Enrollment Form</button>
+            <button type="submit" id="mainSubmitBtn" class="btn btn-primary" style="width:100%; justify-content:center; margin-top:24px; background:var(--gold);">Isumite ang ALS Enrollment Form</button>
 
             <div class="form-success" id="formSuccess">
-              <p id="successMainMessage" style="margin-bottom:0;">&#9989; Salamat! Natanggap na ang inyong ALS enrollment application. Susuriin ito ng aming ALS coordinator at aabisuhan kayo sa pamamagitan ng email o tawag.</p>
+              <p id="successMainMessage" style="margin-bottom:0;">Salamat! Natanggap na ang inyong ALS enrollment application. Susuriin ito ng aming ALS coordinator at aabisuhan kayo sa pamamagitan ng email o tawag.</p>
 
               <div id="fallbackBlock" style="display:none; margin-top:14px;">
-                <p style="margin-bottom:10px; color:#B00020; font-weight:600;">&#9888;&#65039; Nagkaproblema sa pag-save ng inyong application sa aming sistema. Mangyaring ipadala ang buod sa ibaba nang direkta sa amin.</p>
+                <p style="margin-bottom:10px; color:#B00020; font-weight:600;">Nagkaproblema sa pag-save ng inyong application sa aming sistema. Mangyaring ipadala ang buod sa ibaba nang direkta sa amin.</p>
                 <div style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px;">
-                  <button type="button" class="btn btn-outline" style="background:var(--green-dark); color:#fff;" onclick="sendViaEmail()">&#128231; Ipadala sa Email</button>
-                  <button type="button" class="btn btn-outline" style="border-color:var(--green-mid); color:var(--green-dark);" onclick="copySummary()">&#128203; Kopyahin ang Buod</button>
+                  <button type="button" class="btn btn-outline" style="background:var(--green-dark); color:#fff;" onclick="sendViaEmail()">Ipadala sa Email</button>
+                  <button type="button" class="btn btn-outline" style="border-color:var(--green-mid); color:var(--green-dark);" onclick="copySummary()">Kopyahin ang Buod</button>
                 </div>
                 <pre id="summaryBox" style="white-space:pre-wrap; background:#fff; border:1px solid #D0E4D8; border-radius:8px; padding:14px; font-size:0.78rem; max-height:340px; overflow-y:auto; font-family:inherit;"></pre>
               </div>
@@ -1445,8 +1489,8 @@ footer {
       <h3 style="color:var(--green-dark); margin-bottom:12px; font-family:'Playfair Display', serif; font-size:1.3rem;">Kumpirmahin ang Pagsumite</h3>
       <p style="color:var(--text-muted); font-size:0.92rem; margin-bottom:24px; line-height:1.6;">Pakisuri muna nang mabuti ang lahat ng inyong nailagay na impormasyon bago isumite. Hindi na ito maaaring baguhin pagkatapos i-submit. Sigurado ka na ba?</p>
       <div style="display:flex; gap:12px; justify-content:flex-end; flex-wrap:wrap;">
-        <button type="button" class="btn btn-outline" style="border-color:var(--green-mid); color:var(--green-dark);" onclick="closeConfirmModal()">&#11013;&#65039; Balikan at Suriin</button>
-        <button type="button" class="btn btn-primary" style="color:var(--green-dark);" id="confirmSubmitBtn">&#9989; Oo, Isumite Na</button>
+        <button type="button" class="btn btn-outline" style="border-color:var(--green-mid); color:var(--green-dark);" onclick="closeConfirmModal()">Balikan at Suriin</button>
+        <button type="button" class="btn btn-primary" style="color:var(--green-dark);" id="confirmSubmitBtn">Oo, Isumite Na</button>
       </div>
     </div>
   </div>
@@ -1579,9 +1623,13 @@ function initSite(activePage) {
       submitBtn.disabled = true;
       submitBtn.style.opacity = '0.5';
       submitBtn.style.cursor = 'not-allowed';
-      submitBtn.textContent = '&#9989; Naisumite Na';
+      submitBtn.textContent = 'Naisumite Na';
 
       const v = id => (document.getElementById(id)?.value || '').trim();
+      const motherTongueValue = () => {
+        const sel = v('motherTongue');
+        return sel === 'Others' ? (v('motherTongueOther') || 'Others') : sel;
+      };
       const radio = name => (document.querySelector(`input[name="${name}"]:checked`)?.value || '-');
       const checks = name => Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map(c => c.value).join(', ') || '-';
       const yn = id => document.getElementById(id)?.checked ? 'Meron' : 'Wala';
@@ -1592,7 +1640,7 @@ function initSite(activePage) {
         `Pangalan: ${v('lastName')}, ${v('firstName')} ${v('middleName')} ${v('extName')}`,
         `Tirahan: ${v('street')}, ${v('barangay')}, ${v('municipality')}, ${v('province')}`,
         `Kapanganakan: ${v('birthdate')} | Kasarian: ${radio('sex')} | Civil Status: ${v('civilStatus') || '-'}`,
-        `PWD: ${radio('pwd')} | Relihiyon: ${v('religion') || '-'} | Mother Tongue: ${v('motherTongue') || '-'}`,
+        `PWD: ${radio('pwd')} | Relihiyon: ${v('religion') || '-'} | Mother Tongue: ${motherTongueValue() || '-'}`,
         `IP Group: ${v('ipGroup') || '-'}`,
         ``,
         `--- Magulang / Guardian ---`,
@@ -1663,7 +1711,7 @@ function initSite(activePage) {
         civil_status: v('civilStatus'),
         pwd: radio('pwd'),
         religion: v('religion'),
-        mother_tongue: v('motherTongue'),
+        mother_tongue: motherTongueValue(),
         ip_group: v('ipGroup'),
 
         father_last_name: v('fatherLast'),
@@ -1730,6 +1778,85 @@ function initSite(activePage) {
     }
   </script>
 
+  <script src="ph_locations_data.js"></script>
+  <script>
+    /* ---- Province / City / Barangay cascading dropdowns ---- */
+    function populateProvinces(selectId) {
+      const sel = document.getElementById(selectId);
+      if (!sel) return;
+      const options = ['<option value="">Piliin...</option>']
+        .concat(PH_LOCATIONS.provinces.map(p => `<option value="${p}">${p}</option>`));
+      sel.innerHTML = options.join('');
+    }
+
+    function populateCities(provinceId, cityId, barangayId) {
+      const provinceSel = document.getElementById(provinceId);
+      const citySel = document.getElementById(cityId);
+      const barangaySel = document.getElementById(barangayId);
+      const province = provinceSel.value;
+      const cities = (province && PH_LOCATIONS.cities[province]) ? PH_LOCATIONS.cities[province] : [];
+      citySel.innerHTML = ['<option value="">Piliin...</option>'].concat(cities.map(c => `<option value="${c}">${c}</option>`)).join('');
+      barangaySel.innerHTML = '<option value="">Piliin muna ang munisipyo/lungsod</option>';
+    }
+
+    function populateBarangays(provinceId, cityId, barangayId) {
+      const provinceSel = document.getElementById(provinceId);
+      const citySel = document.getElementById(cityId);
+      const barangaySel = document.getElementById(barangayId);
+      const key = provinceSel.value + '|' + citySel.value;
+      const barangays = (citySel.value && PH_LOCATIONS.barangays[key]) ? PH_LOCATIONS.barangays[key] : [];
+      barangaySel.innerHTML = ['<option value="">Piliin...</option>'].concat(barangays.map(b => `<option value="${b}">${b}</option>`)).join('');
+    }
+
+    populateProvinces('province');
+    (function () {
+      const prov = document.getElementById('province');
+      if (prov) {
+        prov.value = 'Iloilo';
+        populateCities('province', 'municipality', 'barangay');
+      }
+    })();
+
+    /* ---- Phone number validation: exactly 11 digits, checked on blur ---- */
+    document.querySelectorAll('.phone-field').forEach(el => {
+      el.addEventListener('input', function () {
+        this.value = this.value.replace(/\D/g, '').slice(0, 11);
+      });
+      el.addEventListener('blur', function () {
+        const warning = document.getElementById(this.id + '-warning');
+        const isRequired = this.hasAttribute('required');
+        const hasValue = this.value.length > 0;
+        const invalid = (isRequired || hasValue) && this.value.length !== 11;
+        this.classList.toggle('field-invalid', invalid);
+        if (warning) {
+          warning.textContent = invalid ? 'Ang contact number ay dapat eksaktong 11 na numero (hal. 09171234567).' : '';
+          warning.classList.toggle('show', invalid);
+        }
+      });
+    });
+
+    /* ---- Email validation: must be a recognized provider extension ---- */
+    const ALLOWED_EMAIL_DOMAINS = ['gmail.com', 'yahoo.com', 'yahoo.com.ph', 'outlook.com', 'hotmail.com', 'icloud.com', 'deped.gov.ph'];
+    document.querySelectorAll('.email-field').forEach(el => {
+      el.addEventListener('blur', function () {
+        const warning = document.getElementById(this.id + '-warning');
+        const value = this.value.trim();
+        let invalid = false;
+        if (value.length > 0) {
+          const match = value.match(/^[^\s@]+@([^\s@]+)$/);
+          const domain = match ? match[1].toLowerCase() : '';
+          invalid = !match || !ALLOWED_EMAIL_DOMAINS.includes(domain);
+        } else if (this.hasAttribute('required')) {
+          invalid = true;
+        }
+        this.classList.toggle('field-invalid', invalid);
+        if (warning) {
+          warning.textContent = invalid ? 'Gumamit ng tamang email address (hal. gmail.com, yahoo.com, outlook.com, hotmail.com, icloud.com).' : '';
+          warning.classList.toggle('show', invalid);
+        }
+      });
+    });
+  </script>
   <script src="chatbot.js"></script>
 </body>
 </html>
