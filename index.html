@@ -148,12 +148,68 @@ nav {
 ============================================================ */
 #hero {
   position: relative;
-  background:
-    linear-gradient(180deg, rgba(27,67,50,0.78), rgba(27,67,50,0.88)),
-    url('assets/Hero.png') center center / cover no-repeat;
   overflow: hidden;
   padding: 100px 24px 80px;
   text-align: center;
+}
+
+.hero-slides {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+
+.hero-slide {
+  position: absolute;
+  inset: 0;
+  background-position: center center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transition: opacity 1s ease;
+}
+
+.hero-slide.active { opacity: 1; }
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(27,67,50,0.62), rgba(27,67,50,0.72));
+  z-index: 1;
+  pointer-events: none;
+}
+
+.hero-carousel-btn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 3;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255,255,255,0.5);
+  background: rgba(27,67,50,0.35);
+  color: var(--white);
+  font-size: 1.3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.hero-carousel-btn:hover {
+  background: rgba(27,67,50,0.6);
+  border-color: var(--gold);
+}
+
+.hero-carousel-btn.prev { left: 20px; }
+.hero-carousel-btn.next { right: 20px; }
+
+@media (max-width: 640px) {
+  .hero-carousel-btn { width: 38px; height: 38px; font-size: 1.1rem; }
+  .hero-carousel-btn.prev { left: 10px; }
+  .hero-carousel-btn.next { right: 10px; }
 }
 
 .hero-bg {
@@ -161,6 +217,7 @@ nav {
   inset: 0;
   opacity: 0.06;
   pointer-events: none;
+  z-index: 2;
 }
 
 .leaf {
@@ -183,7 +240,7 @@ nav {
 
 .hero-content {
   position: relative;
-  z-index: 1;
+  z-index: 3;
 }
 
 .hero-logo {
@@ -767,6 +824,19 @@ footer {
        HERO
   ============================================================ -->
   <section id="hero">
+    <div class="hero-slides" id="heroSlides">
+      <div class="hero-slide active" style="background-image: url('assets/Hero.png');"></div>
+      <div class="hero-slide" style="background-image: url('assets/pic1.jpg');"></div>
+      <div class="hero-slide" style="background-image: url('assets/pic2.jpg');"></div>
+      <div class="hero-slide" style="background-image: url('assets/pic3.jpg');"></div>
+      <div class="hero-slide" style="background-image: url('assets/pic4.jpg');"></div>
+      <div class="hero-slide" style="background-image: url('assets/pic5.jpg');"></div>
+    </div>
+    <div class="hero-overlay"></div>
+
+    <button type="button" class="hero-carousel-btn prev" onclick="heroCarouselMove(-1)" aria-label="Previous slide">&#8249;</button>
+    <button type="button" class="hero-carousel-btn next" onclick="heroCarouselMove(1)" aria-label="Next slide">&#8250;</button>
+
     <svg class="hero-bg" viewBox="0 0 1200 500" preserveAspectRatio="xMidYMid slice">
       <g fill="#40916C">
         <ellipse class="leaf" cx="150" cy="400" rx="60" ry="200" />
@@ -1148,5 +1218,32 @@ function formatDate(dateStr) {
 loadData();
   </script>
   <script src="chatbot.js"></script>
+
+  <script>
+    /* ---- Hero background carousel ---- */
+    (function () {
+      const slides = document.querySelectorAll('#heroSlides .hero-slide');
+      let heroIndex = 0;
+      let heroAutoplayTimer = null;
+
+      function showHeroSlide(i) {
+        slides[heroIndex].classList.remove('active');
+        heroIndex = (i + slides.length) % slides.length;
+        slides[heroIndex].classList.add('active');
+      }
+
+      window.heroCarouselMove = function (direction) {
+        showHeroSlide(heroIndex + direction);
+        restartHeroAutoplay();
+      };
+
+      function restartHeroAutoplay() {
+        clearInterval(heroAutoplayTimer);
+        heroAutoplayTimer = setInterval(() => showHeroSlide(heroIndex + 1), 6000);
+      }
+
+      if (slides.length) restartHeroAutoplay();
+    })();
+  </script>
 </body>
 </html>
