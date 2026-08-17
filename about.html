@@ -12,6 +12,7 @@
 ============================================================ */
 :root {
   --green-dark:   #1B4332;
+  --green-deep:   #0F2A1E;
   --green-mid:    #40916C;
   --green-light:  #D8F3DC;
   --cream:        #FEFAE0;
@@ -19,9 +20,13 @@
   --text:         #1C1C1C;
   --text-muted:   #5A6B5A;
   --gold:         #D4A017;
+  --gold-deep:    #A9790F;
+  --gold-soft:    #F6E9C9;
+  --gold-soft-text: #8A6410;
   --white:        #FFFFFF;
   --radius:       10px;
   --shadow:       0 2px 16px rgba(27,67,50,0.08);
+  --shadow-lg:    0 8px 32px rgba(15,42,30,0.16);
 }
 
 /* ============================================================
@@ -419,18 +424,8 @@ nav {
   display: flex;
   align-items: flex-start;
   gap: 14px;
-}
-
-.highlight-icon {
-  width: 40px;
-  height: 40px;
-  background: var(--green-light);
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  font-size: 1.2rem;
+  padding-left: 14px;
+  border-left: 3px solid var(--green-mid);
 }
 
 .highlight-item h4 {
@@ -489,7 +484,201 @@ nav {
   color: rgba(255,255,255,0.85);
 }
 
-.contact-icon { font-size: 1rem; }
+.contact-icon {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--gold);
+  flex-shrink: 0;
+  min-width: 52px;
+}
+
+/* ============================================================
+   DEEP-DIVE TOPIC SECTIONS
+   (K–12 Program, Free Education, DepEd Accreditation, Location)
+============================================================ */
+.deep-section {
+  padding: 76px 0;
+  scroll-margin-top: 84px; /* so the sticky nav doesn't cover the anchor target */
+}
+
+.deep-grid {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  gap: 56px;
+  align-items: center;
+}
+
+.deep-grid.reverse .deep-visual { order: -1; }
+
+@media (max-width: 820px) {
+  .deep-grid,
+  .deep-grid.reverse { grid-template-columns: 1fr; gap: 32px; }
+  .deep-grid.reverse .deep-visual { order: 0; }
+}
+
+.deep-eyebrow {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--green-mid);
+  margin-bottom: 10px;
+}
+
+.deep-title {
+  font-size: clamp(1.4rem, 2.6vw, 1.9rem);
+  color: var(--green-dark);
+  margin-bottom: 18px;
+}
+
+.deep-copy p {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+  margin-bottom: 14px;
+}
+
+.deep-copy p:last-child { margin-bottom: 0; }
+
+/* ---- K–12 ladder visual ---- */
+.ladder {
+  background: var(--white);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  padding: 28px 26px;
+}
+
+.ladder-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 11px 0;
+  border-bottom: 1px solid rgba(27,67,50,0.08);
+}
+
+.ladder-row:last-child { border-bottom: none; }
+
+.ladder-num {
+  flex-shrink: 0;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: var(--green-light);
+  color: var(--green-dark);
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-size: 0.78rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ladder-label { font-size: 0.88rem; color: var(--text); font-weight: 600; }
+.ladder-sub { font-size: 0.76rem; color: var(--text-muted); }
+
+.strand-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 16px; }
+
+.strand-pill {
+  background: var(--gold-soft);
+  color: var(--gold-soft-text);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  padding: 5px 12px;
+  border-radius: 20px;
+}
+
+/* ---- Free education checklist visual ---- */
+.free-card {
+  background: var(--green-dark);
+  border-radius: 16px;
+  padding: 32px 28px;
+  color: var(--white);
+}
+
+.free-card h4 {
+  font-family: 'Playfair Display', serif;
+  font-size: 1.1rem;
+  margin-bottom: 18px;
+  color: var(--gold-soft);
+}
+
+.free-list { display: flex; flex-direction: column; gap: 12px; }
+
+.free-list-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 0.87rem;
+  color: rgba(255,255,255,0.9);
+}
+
+.free-list-item::before {
+  content: '';
+  flex-shrink: 0;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--gold);
+  margin-top: 6px;
+}
+
+/* ---- DepEd credential card ---- */
+.credential-card {
+  background: var(--white);
+  border-radius: 16px;
+  box-shadow: var(--shadow);
+  padding: 30px 28px;
+  border-top: 4px solid var(--gold);
+}
+
+.credential-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-bottom: 1px dashed rgba(27,67,50,0.15);
+  font-size: 0.85rem;
+}
+
+.credential-row:last-child { border-bottom: none; }
+
+.credential-label {
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.credential-value {
+  color: var(--green-dark);
+  font-weight: 700;
+  text-align: right;
+}
+
+/* ---- Location facts card ---- */
+.locate-card {
+  background: var(--cream);
+  border-radius: 16px;
+  padding: 30px 28px;
+}
+
+.locate-fact { margin-bottom: 18px; }
+.locate-fact:last-child { margin-bottom: 0; }
+
+.locate-fact-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--green-mid);
+  margin-bottom: 4px;
+}
+
+.locate-fact-value {
+  font-size: 0.92rem;
+  color: var(--green-dark);
+  font-weight: 600;
+}
 
 /* ============================================================
    MAP SECTION
@@ -844,6 +1033,129 @@ footer {
   .nav-links a { padding: 10px 14px; }
 }
 
+/* ============================================================
+   SCROLL REVEAL
+   Content fades and slides into place as it enters the viewport.
+============================================================ */
+.reveal {
+  opacity: 0;
+  transition: opacity 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+              transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.reveal-left  { transform: translateX(-28px); }
+.reveal-right { transform: translateX(28px); }
+.reveal-up    { transform: translateY(28px); }
+
+.reveal.reveal-visible {
+  opacity: 1;
+  transform: translate(0, 0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; transition: none; }
+}
+
+/* ============================================================
+   SECTION HOVER
+   Each major section lifts slightly and picks up a soft tint
+   when the mouse is over it.
+============================================================ */
+#about,
+.deep-section,
+#map-section {
+  position: relative;
+  transition: background-color 0.5s ease;
+}
+
+#about::after,
+.deep-section::after,
+#map-section::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(64,145,108,0.05), rgba(64,145,108,0) 65%);
+  opacity: 0;
+  transition: opacity 0.45s ease;
+  pointer-events: none;
+}
+
+#about:hover::after,
+.deep-section:hover::after,
+#map-section:hover::after {
+  opacity: 1;
+}
+
+#about .container,
+.deep-section .container,
+#map-section .container {
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+#about:hover .container,
+.deep-section:hover .container,
+#map-section:hover .container {
+  transform: translateY(-4px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #about .container,
+  .deep-section .container,
+  #map-section .container { transform: none !important; }
+  #about::after,
+  .deep-section::after,
+  #map-section::after { display: none; }
+}
+
+/* ============================================================
+   ANCHOR ARRIVAL HIGHLIGHT
+   Briefly outlines the section a visitor is sent to from index.html
+============================================================ */
+.section-target::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-top: 2px solid var(--gold);
+  border-bottom: 2px solid var(--gold);
+  background: linear-gradient(180deg, rgba(212,160,23,0.09), rgba(212,160,23,0) 70%);
+  opacity: 0;
+  animation: sectionTargetPulse 1.8s ease-out forwards;
+  pointer-events: none;
+}
+
+@keyframes sectionTargetPulse {
+  0%   { opacity: 0; }
+  12%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .section-target::before { animation: none; opacity: 0; }
+}
+
+/* ============================================================
+   PAGE HERO ENTRANCE
+============================================================ */
+.page-hero .section-label,
+.page-hero h1,
+.page-hero p {
+  opacity: 0;
+  transform: translateY(14px);
+  animation: heroFadeUp 0.7s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+.page-hero h1 { animation-delay: 0.08s; }
+.page-hero p  { animation-delay: 0.16s; }
+
+@keyframes heroFadeUp {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-hero .section-label,
+  .page-hero h1,
+  .page-hero p { opacity: 1; transform: none; animation: none; }
+}
+
   </style>
 </head>
 <body>
@@ -859,28 +1171,25 @@ footer {
   <section id="about" style="background: var(--bg);">
     <div class="container">
       <div class="about-grid">
-        <div class="about-text">
+        <div class="about-text reveal reveal-left">
           <p class="section-label">Tungkol Sa Amin</p>
           <h2 class="section-title">Isang Paaralan na May Puso para sa Komunidad</h2>
           <p>Ang Tiu Cho Teg - Ana Ros Foundation Integrated Farm School ay isang pampublikong paaralan sa ilalim ng DepEd na nakatuon sa pagbibigay ng kalidad na edukasyon sa mga kabataang Ilonggo.</p>
           <p>Bilang isang Integrated Farm School, pinagsasama namin ang akademikong programa at praktikal na kaalaman sa pagsasaka — naghahanda sa aming mga mag-aaral hindi lamang para sa kolehiyo kundi pati na rin para sa buhay.</p>
           <div class="about-highlights">
             <div class="highlight-item">
-              <div class="highlight-icon">🌱</div>
               <div>
                 <h4>Integrated Farm Program</h4>
                 <p>Praktikal na edukasyon sa pamamagitan ng pagsasaka at agrikultura</p>
               </div>
             </div>
             <div class="highlight-item">
-              <div class="highlight-icon">📚</div>
               <div>
                 <h4>K–12 Curriculum</h4>
                 <p>Kumpleto mula Grade 1 hanggang Senior High School</p>
               </div>
             </div>
             <div class="highlight-item">
-              <div class="highlight-icon">🏆</div>
               <div>
                 <h4>Award-Winning School</h4>
                 <p>Silver Medal, Elementary Football — at marami pang tagumpay</p>
@@ -888,22 +1197,183 @@ footer {
             </div>
           </div>
         </div>
-        <div class="about-visual">
+        <div class="about-visual reveal reveal-right">
           <img src="assets/logo.png" alt="School Logo" />
           <h3>Makipag-ugnayan Sa Amin</h3>
           <p>Handa kaming sagutin ang inyong mga katanungan</p>
           <div class="contact-info">
             <div class="contact-row">
-              <span class="contact-icon">📞</span>
+              <span class="contact-icon">Tel</span>
               <span>+63 33 337 8522</span>
             </div>
             <div class="contact-row">
-              <span class="contact-icon">✉️</span>
+              <span class="contact-icon">Email</span>
               <span>500191@deped.gov.ph</span>
             </div>
             <div class="contact-row">
-              <span class="contact-icon">📍</span>
+              <span class="contact-icon">Address</span>
               <span>Iloilo Radial By-Pass Rd 4, Lanit, Jaro, Iloilo City</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       K–12 PROGRAM
+  ============================================================ -->
+  <section id="program-k12" class="deep-section" style="background: var(--white);">
+    <div class="container">
+      <div class="deep-grid">
+        <div class="deep-copy reveal reveal-left">
+          <p class="deep-eyebrow">K–12 na Programa</p>
+          <h2 class="deep-title">Isang Paaralan, Buong Landas Mula Kindergarten Hanggang Senior High</h2>
+          <p>Sa Tiu Cho Teg - Ana Ros Foundation Integrated Farm School, sinusundan namin ang buong K to 12 na kurikulum ng Pilipinas sa ilalim ng Republic Act 10533 (Enhanced Basic Education Act) — mula sa isang taon ng Kindergarten, anim na taon ng elementarya, apat na taon ng junior high school, hanggang dalawang taon ng senior high school. Ibig sabihin, hindi na kailangan pang lumipat ng ibang paaralan ang isang bata mula sa unang araw niya ng pasukan hanggang sa pagtanggap niya ng diploma.</p>
+          <p>Ang aming pagkakaiba: dinadagdagan namin ang core K-12 curriculum ng aktwal na karanasan sa Integrated Farm Program — mushroom culture, vegetable gardening, at hydroponics — kaya lumalabas ang aming mga mag-aaral hindi lamang marunong sa aklat, kundi may kasanayan din sa totoong buhay na kanilang madadala kahit saan.</p>
+          <p>Para sa Senior High School, nag-aalok kami ng mga akademikong strand tulad ng STEM, HUMSS, at ABM, kaya't ang bawat mag-aaral ay may kakayahang piliin ang landas na pinakaangkop sa kanilang mga pangarap — maging ito man ay pagpasok sa kolehiyo, pagnenegosyo, o direktang pagtatrabaho matapos ang Grade 12.</p>
+        </div>
+        <div class="deep-visual reveal reveal-right">
+          <div class="ladder">
+            <div class="ladder-row">
+              <div class="ladder-num">K</div>
+              <div>
+                <div class="ladder-label">Kindergarten</div>
+                <div class="ladder-sub">Batayan ng pormal na edukasyon</div>
+              </div>
+            </div>
+            <div class="ladder-row">
+              <div class="ladder-num">1–6</div>
+              <div>
+                <div class="ladder-label">Elementarya</div>
+                <div class="ladder-sub">Grade 1 hanggang Grade 6</div>
+              </div>
+            </div>
+            <div class="ladder-row">
+              <div class="ladder-num">7–10</div>
+              <div>
+                <div class="ladder-label">Junior High School</div>
+                <div class="ladder-sub">Grade 7 hanggang Grade 10</div>
+              </div>
+            </div>
+            <div class="ladder-row">
+              <div class="ladder-num">11–12</div>
+              <div>
+                <div class="ladder-label">Senior High School</div>
+                <div class="ladder-sub">Grade 11 hanggang Grade 12</div>
+              </div>
+            </div>
+            <div class="strand-pills">
+              <span class="strand-pill">STEM</span>
+              <span class="strand-pill">HUMSS</span>
+              <span class="strand-pill">ABM</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       FREE EDUCATION
+  ============================================================ -->
+  <section id="free-education" class="deep-section" style="background: var(--bg);">
+    <div class="container">
+      <div class="deep-grid reverse">
+        <div class="deep-copy reveal reveal-right">
+          <p class="deep-eyebrow">Libreng Edukasyon</p>
+          <h2 class="deep-title">Walang Bayad na Edukasyon, Para sa Bawat Pamilyang Ilonggo</h2>
+          <p>Bilang isang pampublikong paaralan sa ilalim ng DepEd, ginagarantiyahan ng 1987 Konstitusyon ng Pilipinas (Artikulo XIV, Seksyon 2) ang libreng pampublikong edukasyon sa antas elementarya at sekondarya para sa lahat ng mamamayang Pilipino. Dagdag pa rito, ginagawang libre at sapilitan ng Republic Act 10157 (Kindergarten Education Act) ang Kindergarten bago pumasok sa Grade 1. Sa madaling salita: walang bayad na tuition, walang miscellaneous fees, mula Kindergarten hanggang Grade 12.</p>
+          <p>Bukas din kami sa mga pamilyang bahagi ng 4Ps (Pantawid Pamilyang Pilipino Program) at mga mag-aaral na may partikular na pangangailangan — bahagi ito ng aming enrollment form upang matiyak na walang mag-aaral na maiiwan dahil lamang sa kakayahang pinansyal ng kanilang pamilya.</p>
+          <p>At dahil kami ay Integrated Farm School, ang praktikal na pagsasanay sa agrikultura — mula sa hydroponics hanggang sa vegetable gardening — ay bahagi rin ng libreng edukasyong ito. Walang karagdagang bayad para sa karanasang ito na sa ibang paaralan ay maaaring hiwalay pang babayaran.</p>
+        </div>
+        <div class="deep-visual reveal reveal-left">
+          <div class="free-card">
+            <h4>Kasama sa Libreng Edukasyon</h4>
+            <div class="free-list">
+              <div class="free-list-item">Walang tuition fee mula Kindergarten hanggang Grade 12</div>
+              <div class="free-list-item">Walang miscellaneous fees para sa regular na enrollment</div>
+              <div class="free-list-item">Libreng learning materials na inaprubahan ng DepEd</div>
+              <div class="free-list-item">Suporta para sa 4Ps at mga batang may partikular na pangangailangan</div>
+              <div class="free-list-item">Kasama na ang Integrated Farm Program — walang dagdag na bayad</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       DEPED ACCREDITATION
+  ============================================================ -->
+  <section id="deped-accredited" class="deep-section" style="background: var(--white);">
+    <div class="container">
+      <div class="deep-grid">
+        <div class="deep-copy reveal reveal-left">
+          <p class="deep-eyebrow">DepEd Akreditado</p>
+          <h2 class="deep-title">Opisyal na Kinikilala ng Department of Education</h2>
+          <p>Ang Tiu Cho Teg - Ana Ros Foundation Integrated Farm School ay isang opisyal na paaralang pampubliko sa ilalim ng Department of Education, na may sariling School ID (500191) na nakatala sa Schools Division Office of Iloilo City, Rehiyon VI — Western Visayas. Ibig sabihin, ang bawat report card, Form 138, at diploma na inisyu ng aming paaralan ay kinikilala sa buong bansa.</p>
+          <p>Sinusunod namin ang mga opisyal na DepEd Order at K to 12 curriculum guides sa bawat asignatura, at ang aming mga guro ay sumasailalim sa parehong mga kwalipikasyon at patuloy na pagsasanay na inaatas sa lahat ng pampublikong guro sa Pilipinas. Nangangahulugan ito ng katiyakan para sa mga magulang: ang kalidad ng edukasyong tatanggapin ng inyong anak dito ay sumusunod sa pambansang pamantayan.</p>
+          <p>Bukod dito, bilang isa sa mga unang itinatag na DepEd Integrated Farm School sa bansa, kinikilala rin kami sa aming mga makabagong programa sa agrikultura at kapaligiran — patunay na ang pagsunod sa pambansang pamantayan ay hindi humahadlang sa pagiging natatangi.</p>
+        </div>
+        <div class="deep-visual reveal reveal-right">
+          <div class="credential-card">
+            <div class="credential-row">
+              <span class="credential-label">Ahensiya</span>
+              <span class="credential-value">Department of Education</span>
+            </div>
+            <div class="credential-row">
+              <span class="credential-label">School ID</span>
+              <span class="credential-value">500191</span>
+            </div>
+            <div class="credential-row">
+              <span class="credential-label">Rehiyon</span>
+              <span class="credential-value">Region VI — Western Visayas</span>
+            </div>
+            <div class="credential-row">
+              <span class="credential-label">Dibisyon</span>
+              <span class="credential-value">Schools Division of Iloilo City</span>
+            </div>
+            <div class="credential-row">
+              <span class="credential-label">Uri ng Paaralan</span>
+              <span class="credential-value">Pampubliko · Integrated Farm School</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       LOCATION
+  ============================================================ -->
+  <section id="location" class="deep-section" style="background: var(--bg);">
+    <div class="container">
+      <div class="deep-grid reverse">
+        <div class="deep-copy reveal reveal-right">
+          <p class="deep-eyebrow">Lokasyon</p>
+          <h2 class="deep-title">Nakatanim sa Puso ng Barangay Lanit, Jaro</h2>
+          <p>Matatagpuan ang aming paaralan sa Iloilo Radial By-Pass Road, Barangay Lanit, Jaro, Iloilo City — isang relocation site community na naglilingkod sa daan-daang pamilyang Ilonggo. Dating kilala bilang Lanit Primary School, lumago ito upang maging kumpletong K-12 na paaralan na naglilingkod sa komunidad kung saan ito unang itinatag.</p>
+          <p>Ang lokasyon na ito ang nagbigay-daan sa amin upang maging kauna-unahang urban farm school sa Pilipinas — pinatunayan na kahit sa gitna ng lungsod, posible ang produktibong pagsasaka sa loob ng school grounds. Sa tulong ng Pamahalaang Lungsod ng Iloilo at ni Punong-lungsod Jerry Treñas, patuloy na lumalawak ang aming mga pasilidad upang mas mapaglingkuran ang aming mga mag-aaral at ang buong komunidad ng Lanit.</p>
+          <p>Madaling puntahan ang paaralan sa pamamagitan ng Iloilo Radial By-Pass Road, na direktang nakakonekta sa mga karatig-barangay ng Jaro. Tingnan sa mapa sa ibaba ang eksaktong lokasyon.</p>
+        </div>
+        <div class="deep-visual reveal reveal-left">
+          <div class="locate-card">
+            <div class="locate-fact">
+              <div class="locate-fact-label">Address</div>
+              <div class="locate-fact-value">Iloilo Radial By-Pass Rd 4, Lanit, Jaro, Iloilo City</div>
+            </div>
+            <div class="locate-fact">
+              <div class="locate-fact-label">Barangay</div>
+              <div class="locate-fact-value">Lanit, Jaro</div>
+            </div>
+            <div class="locate-fact">
+              <div class="locate-fact-label">Dating Pangalan</div>
+              <div class="locate-fact-value">Lanit Primary School</div>
+            </div>
+            <div class="locate-fact">
+              <div class="locate-fact-label">Kilala Bilang</div>
+              <div class="locate-fact-value">Unang Urban Farm School sa Pilipinas</div>
             </div>
           </div>
         </div>
@@ -929,7 +1399,7 @@ footer {
         </iframe>
       </div>
       <p class="map-caption">
-        📍 Iloilo Radial By-Pass Rd 4, Lanit, Jaro, Iloilo City &nbsp;·&nbsp;
+        Iloilo Radial By-Pass Rd 4, Lanit, Jaro, Iloilo City &nbsp;·&nbsp;
         <a href="https://maps.google.com/?cid=18264349933014790556" target="_blank" rel="noopener">Buksan sa Google Maps →</a>
       </p>
     </div>
@@ -1021,6 +1491,69 @@ function initSite(activePage) {
   </script>
   <script>
     initSite('about');
+  </script>
+
+  <script>
+/* ============================================================
+   SCROLL REVEAL
+   Fades/slides each flagged block into place the first time it
+   enters the viewport, then stops watching it.
+============================================================ */
+function initScrollReveal() {
+  const items = document.querySelectorAll('.reveal');
+  if (!items.length) return;
+
+  if (!('IntersectionObserver' in window)) {
+    items.forEach(el => el.classList.add('reveal-visible'));
+    return;
+  }
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('reveal-visible');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
+
+  items.forEach(el => observer.observe(el));
+}
+
+/* ============================================================
+   ANCHOR ARRIVAL HIGHLIGHT
+   When this page is opened (or re-navigated) with a hash like
+   about.html#program-k12, briefly outline that section once the
+   smooth scroll has settled, so it's obvious where the click
+   from index.html landed.
+============================================================ */
+function highlightTargetSection() {
+  const hash = window.location.hash;
+  if (!hash) return;
+
+  let target;
+  try {
+    target = document.querySelector(hash);
+  } catch (e) {
+    return;
+  }
+  if (!target) return;
+
+  target.classList.remove('section-target');
+  // Force reflow so the animation can restart if the same hash is clicked twice
+  void target.offsetWidth;
+
+  window.setTimeout(() => {
+    target.classList.add('section-target');
+    window.setTimeout(() => target.classList.remove('section-target'), 1800);
+  }, 400);
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  initScrollReveal();
+  highlightTargetSection();
+});
+window.addEventListener('hashchange', highlightTargetSection);
   </script>
 </body>
 </html>

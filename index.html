@@ -12,6 +12,7 @@
 ============================================================ */
 :root {
   --green-dark:   #1B4332;
+  --green-deep:   #0F2A1E;
   --green-mid:    #40916C;
   --green-light:  #D8F3DC;
   --cream:        #FEFAE0;
@@ -19,9 +20,13 @@
   --text:         #1C1C1C;
   --text-muted:   #5A6B5A;
   --gold:         #D4A017;
+  --gold-deep:    #A9790F;
+  --gold-soft:    #F6E9C9;
+  --gold-soft-text: #8A6410;
   --white:        #FFFFFF;
   --radius:       10px;
   --shadow:       0 2px 16px rgba(27,67,50,0.08);
+  --shadow-lg:    0 8px 32px rgba(15,42,30,0.16);
 }
 
 /* ============================================================
@@ -134,7 +139,7 @@ nav {
 }
 
 .nav-enroll:hover {
-  background: #b8880f !important;
+  background: var(--gold-deep) !important;
   color: var(--white) !important;
 }
 
@@ -260,18 +265,48 @@ nav {
    STATS STRIP
 ============================================================ */
 #stats {
-  background: var(--green-mid);
-  padding: 28px 24px;
+  background: linear-gradient(120deg, var(--green-deep) 0%, var(--green-dark) 45%, var(--green-mid) 100%);
+  padding: 30px 24px;
 }
 
 .stats-grid {
   display: flex;
   justify-content: center;
-  gap: 48px;
+  gap: 12px;
   flex-wrap: wrap;
   max-width: 1100px;
   margin: 0 auto;
   text-align: center;
+}
+
+.stat-link {
+  position: relative;
+  display: block;
+  padding: 12px 36px;
+  border-radius: var(--radius);
+  text-decoration: none;
+  transition: background 0.2s, transform 0.15s;
+}
+
+.stat-link:not(:first-child)::before {
+  content: '';
+  position: absolute;
+  left: -1px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 1px;
+  height: 28px;
+  background: rgba(255,255,255,0.2);
+}
+
+@media (max-width: 640px) {
+  .stat-link:not(:first-child)::before { display: none; }
+}
+
+.stat-link:hover,
+.stat-link:focus-visible {
+  background: rgba(255,255,255,0.08);
+  transform: translateY(-2px);
 }
 
 .stat-number {
@@ -286,6 +321,8 @@ nav {
   color: rgba(255,255,255,0.75);
   margin-top: 4px;
 }
+
+.stat-link:hover .stat-number { color: var(--gold-soft); }
 
 /* ============================================================
    PRINCIPAL WELCOME SECTION
@@ -391,11 +428,30 @@ nav {
   border-radius: var(--radius);
   padding: 16px 18px;
   box-shadow: var(--shadow);
+  border-left: 3px solid var(--green-mid);
+  transition: box-shadow 0.2s, transform 0.2s, border-color 0.2s;
+}
+
+.milestone-item:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateX(2px);
+  border-left-color: var(--gold);
 }
 
 .milestone-icon {
-  font-size: 1.3rem;
   flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: var(--green-light);
+  color: var(--green-dark);
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: inset 0 0 0 2px rgba(212,160,23,0.35);
 }
 
 .milestone-item h4 {
@@ -492,8 +548,8 @@ nav {
 }
 
 .badge-gold {
-  background: #FFF3CD;
-  color: #856404;
+  background: var(--gold-soft);
+  color: var(--gold-soft-text);
 }
 
 .announcement-card h3 {
@@ -726,9 +782,9 @@ footer {
       <p class="hero-tagline">DepEd — Pampublikong Paaralan · Iloilo City</p>
       <h1 class="hero-title">Tiu Cho Teg - Ana Ros Foundation Integrated Farm School</h1>
       <p class="hero-sub">Dating Lanit Primary School</p>
-      <p class="hero-location">📍 Iloilo Radial By-Pass Rd 4, Lanit, Jaro, Iloilo City &nbsp;·&nbsp; 📞 +63 33 337 8522</p>
+      <p class="hero-location">Iloilo Radial By-Pass Rd 4, Lanit, Jaro, Iloilo City &nbsp;·&nbsp; +63 33 337 8522</p>
       <div class="hero-actions">
-        <a href="enrollment.html" class="btn btn-primary">✏️ Mag-Enroll Ngayon</a>
+        <a href="enrollment.html" class="btn btn-primary">Mag-Enroll Ngayon</a>
         <a href="about.html" class="btn btn-outline">Alamin ang Higit Pa</a>
       </div>
     </div>
@@ -739,22 +795,22 @@ footer {
   ============================================================ -->
   <section id="stats">
     <div class="stats-grid">
-      <div>
+      <a href="about.html#program-k12" class="stat-link">
         <div class="stat-number">K–12</div>
         <div class="stat-label">Programa ng Paaralan</div>
-      </div>
-      <div>
+      </a>
+      <a href="about.html#free-education" class="stat-link">
         <div class="stat-number">Libre</div>
         <div class="stat-label">Walang Bayad na Edukasyon</div>
-      </div>
-      <div>
+      </a>
+      <a href="about.html#deped-accredited" class="stat-link">
         <div class="stat-number">DepEd</div>
         <div class="stat-label">Akreditado</div>
-      </div>
-      <div>
+      </a>
+      <a href="about.html#location" class="stat-link">
         <div class="stat-number">Lanit</div>
         <div class="stat-label">Jaro, Iloilo City</div>
-      </div>
+      </a>
     </div>
   </section>
 
@@ -797,34 +853,37 @@ footer {
         </div>
         <div class="history-milestones">
           <div class="milestone-item">
-            <div class="milestone-icon">🏫</div>
+            <div class="milestone-icon">01</div>
             <div>
               <h4>Mula Lanit Primary School</h4>
               <p>Nagsimula bilang isang ordinaryong paaralang elementarya sa Lanit, Jaro</p>
             </div>
           </div>
           <div class="milestone-item">
-            <div class="milestone-icon">🌱</div>
+            <div class="milestone-icon">02</div>
             <div>
               <h4>Unang Urban Farm School sa Bansa</h4>
               <p>Isa sa mga unang itinatag na DepEd Integrated Farm School, nakatuon sa mushroom culture, vegetable gardening, at hydroponics</p>
             </div>
           </div>
           <div class="milestone-item">
-            <div class="milestone-icon">🏗️</div>
+            <div class="milestone-icon">03</div>
             <div>
               <h4>Suporta mula sa LGU Iloilo City</h4>
               <p>Multi-storey na gusali na inialay ni Punong-lungsod Jerry Treñas upang palawakin ang mga pasilidad ng paaralan</p>
             </div>
           </div>
           <div class="milestone-item">
-            <div class="milestone-icon">🌳</div>
+            <div class="milestone-icon">04</div>
             <div>
               <h4>Kilalang Environmental Programs</h4>
               <p>Host ng ECo Champions tree-planting launch (Hunyo 2025) at DA-supported Gulayan sa Bakanteng Lote project</p>
             </div>
           </div>
         </div>
+      </div>
+      <div style="text-align:center; margin-top:32px;">
+        <a href="about.html" class="btn btn-outline" style="color:var(--green-dark); border-color:var(--green-mid);">Alamin Pa Ang Aming Kasaysayan →</a>
       </div>
     </div>
   </section>
@@ -875,7 +934,7 @@ footer {
       </div>
       <p class="testimonial-disclaimer" id="testimonialDisclaimer" style="display:none;">Halimbawang mga testimonial lamang ito — palitan ng aktuwal na mga sinasabi ng mga magulang, mag-aaral, at alumni bago ilathala.</p>
       <div style="text-align:center; margin-top:28px;">
-        <a href="submit-testimonial.html" class="btn btn-outline" style="color:var(--green-dark); border-color:var(--green-mid);">✏️ Magbahagi ng Iyong Karanasan →</a>
+        <a href="submit-testimonial.html" class="btn btn-outline" style="color:var(--green-dark); border-color:var(--green-mid);">Magbahagi ng Iyong Karanasan →</a>
       </div>
     </div>
   </section>
@@ -887,7 +946,7 @@ footer {
     <h2>Handa Ka Na Bang Mag-Enroll?</h2>
     <p>Kumpletuhin ang iyong online enrollment ngayon. Libre at madali lamang.</p>
     <a href="enrollment.html" class="btn btn-primary" style="font-size:1rem; padding:14px 36px;">
-      ✏️ Simulan ang Enrollment
+      Simulan ang Enrollment
     </a>
   </section>
 
