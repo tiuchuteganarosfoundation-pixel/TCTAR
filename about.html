@@ -2128,12 +2128,46 @@ function setPinLocation(lat, lon) {
   }).catch(() => {});
 }
 
+// Nominatim's own docs acknowledge that "suburb" vs "city_district" don't
+// consistently map to the same administrative level across different areas
+// — so guessing a single field name for "the district" isn't reliable.
+// Instead, we check every plausible field against Iloilo City's actual
+// known districts, and only keep it if it's a real match. This correctly
+// keeps official divisions (La Paz, Jaro, Molo, Mandurriao, Arevalo, City
+// Proper) whichever field they happen to land in, while still dropping
+// finer barangay-level names (which aren't on this list and can be
+// mistagged near boundary lines — the road/coordinates stay accurate
+// either way, only that label word could be off).
+const ILOILO_CITY_DISTRICTS = [
+  'city proper', 'iloilo city proper', 'jaro', 'la paz', 'mandurriao',
+  'molo', 'arevalo', 'lapuz'
+];
+
+function findKnownDistrict(addr) {
+  const candidates = [addr.suburb, addr.city_district, addr.borough, addr.district, addr.quarter, addr.neighbourhood];
+  for (const c of candidates) {
+    if (c && ILOILO_CITY_DISTRICTS.includes(c.toLowerCase())) return c;
+  }
+  return null;
+}
+
+function buildSoftAddress(result) {
+  const addr = result.address;
+  if (!addr) return result.display_name;
+  const road = addr.road || addr.pedestrian || addr.footway || addr.residential;
+  const district = findKnownDistrict(addr);
+  const cityLevel = addr.city || addr.town || addr.municipality || addr.village;
+  const state = addr.state;
+  const parts = [road, district, cityLevel, state].filter(Boolean);
+  return parts.length ? parts.join(', ') : result.display_name;
+}
+
 async function reverseGeocode(lat, lon) {
-  const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`;
+  const url = `https://nominatim.openstreetmap.org/reverse?format=json&addressdetails=1&lat=${lat}&lon=${lon}`;
   const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
   if (!res.ok) return null;
   const data = await res.json();
-  return data && data.display_name ? data.display_name : null;
+  return data && data.display_name ? buildSoftAddress(data) : null;
 }
 
 function setPinStatus(message, hasPin) {
@@ -2253,7 +2287,7 @@ function generateAddressFallbacks(query) {
 
 async function geocodeAddress(query) {
   for (const variant of generateAddressFallbacks(query)) {
-    const url = `https://nominatim.openstreetmap.org/search?format=json&limit=1&countrycodes=ph&q=${encodeURIComponent(variant)}`;
+    const url = `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=1&countrycodes=ph&q=${encodeURIComponent(variant)}`;
     const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
     if (!res.ok) continue;
     const results = await res.json();
@@ -2261,7 +2295,7 @@ async function geocodeAddress(query) {
       return {
         lat: parseFloat(results[0].lat),
         lon: parseFloat(results[0].lon),
-        label: results[0].display_name,
+        label: buildSoftAddress(results[0]),
         approximate: variant !== query
       };
     }
@@ -2271,7 +2305,7 @@ async function geocodeAddress(query) {
 
 async function fetchSuggestions(query) {
   for (const variant of generateAddressFallbacks(query)) {
-    const url = `https://nominatim.openstreetmap.org/search?format=json&limit=6&countrycodes=ph&viewbox=${ILOILO_VIEWBOX}&bounded=0&q=${encodeURIComponent(variant)}`;
+    const url = `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=6&countrycodes=ph&viewbox=${ILOILO_VIEWBOX}&bounded=0&q=${encodeURIComponent(variant)}`;
     const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
     if (!res.ok) continue;
     const results = await res.json();
@@ -2296,7 +2330,7 @@ function renderSuggestions(results, approximate) {
     : '';
 
   box.innerHTML = note + results.map((r, i) =>
-    `<div class="route-suggestion-item" data-idx="${i}">${r.display_name}</div>`
+    `<div class="route-suggestion-item" data-idx="${i}">${buildSoftAddress(r)}</div>`
   ).join('');
   box.classList.add('show');
 
@@ -2317,8 +2351,9 @@ function selectSuggestion(idx) {
   const r = currentSuggestions[idx];
   if (!r) return;
   const input = document.getElementById('routeAddressInput');
-  input.value = r.display_name;
-  selectedOrigin = { lat: parseFloat(r.lat), lon: parseFloat(r.lon), label: r.display_name };
+  const softLabel = buildSoftAddress(r);
+  input.value = softLabel;
+  selectedOrigin = { lat: parseFloat(r.lat), lon: parseFloat(r.lon), label: softLabel };
   hideSuggestions();
 }
 
