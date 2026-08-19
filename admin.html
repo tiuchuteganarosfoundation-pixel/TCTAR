@@ -282,6 +282,7 @@
         <button class="tab-btn active" onclick="switchTab('announcements')">📢 Mga Anunsyo</button>
         <button class="tab-btn" onclick="switchTab('faqs')">❓ FAQs</button>
         <button class="tab-btn" onclick="switchTab('video')">🎥 Video</button>
+        <button class="tab-btn" onclick="switchTab('principal')">🎓 Punong-guro</button>
         <button class="tab-btn" onclick="switchTab('testimonials')">💬 Mga Testimonial</button>
         <button class="tab-btn" onclick="switchTab('export')">💾 I-Export / I-Import</button>
       </div>
@@ -362,6 +363,46 @@
             <button class="btn btn-gold" onclick="saveVideo()">💾 I-Save ang Video</button>
             <button class="btn btn-danger" onclick="removeVideo()">🗑️ Alisin ang Video</button>
           </div>
+        </div>
+      </div>
+
+      <!-- PRINCIPAL TAB -->
+      <div class="tab-panel" id="tab-principal">
+        <div class="card">
+          <h3>🎓 Kasalukuyang Larawan ng Punong-guro</h3>
+          <div id="principal-current-photo" style="margin-bottom:16px;">
+            <div class="empty-state">Wala pang larawan na naka-set.</div>
+          </div>
+          <div class="field">
+            <label>Palitan ang Larawan (JPG, PNG, o WEBP)</label>
+            <input type="file" id="principal-photo-input" accept="image/jpeg,image/png,image/webp" />
+          </div>
+          <button class="btn btn-gold" onclick="savePrincipalPhoto()" id="principal-photo-btn">💾 I-Upload ang Larawan</button>
+          <p id="principal-photo-status" style="font-size:0.82rem; color:var(--muted); margin-top:8px;"></p>
+        </div>
+
+        <div class="card">
+          <h3>✏️ Impormasyon at Mensahe</h3>
+          <p style="font-size:0.85rem; color:var(--muted); margin-bottom:16px;">
+            Ito ang lalabas sa "Mensahe Mula sa Punong-guro" section ng homepage. Para sa mensahe, ihiwalay ang bawat talata sa pamamagitan ng blangkong linya (Enter nang dalawang beses) — awtomatiko itong hahatiin sa magkakahiwalay na talata sa website.
+          </p>
+          <div class="field">
+            <label>Buong Pangalan</label>
+            <input type="text" id="principal-name" placeholder="Halimbawa: Dr. Michael A. Marquez" />
+          </div>
+          <div class="field">
+            <label>Titulo / Posisyon</label>
+            <input type="text" id="principal-role" placeholder="Halimbawa: Punong-guro, TCTAR Integrated Farm School" />
+          </div>
+          <div class="field">
+            <label>Mensahe</label>
+            <textarea id="principal-message" rows="8" placeholder="Isulat ang mensahe ng punong-guro dito. Ihiwalay ang mga talata sa pamamagitan ng blangkong linya."></textarea>
+          </div>
+          <div class="field">
+            <label>Pirma / Sign-off</label>
+            <input type="text" id="principal-signoff" placeholder="Halimbawa: — Dr. Michael A. Marquez" />
+          </div>
+          <button class="btn btn-gold" onclick="savePrincipalInfo()">💾 I-Save ang Impormasyon</button>
         </div>
       </div>
 
@@ -476,7 +517,7 @@
 
     // LOAD ALL DATA FROM API
     async function loadAll() {
-      await Promise.all([loadAnnouncements(), loadFAQs(), loadVideo(), loadTestimonials()]);
+      await Promise.all([loadAnnouncements(), loadFAQs(), loadVideo(), loadTestimonials(), loadPrincipal()]);
     }
 
     // ============================================================
@@ -697,6 +738,97 @@
       `;
       document.getElementById('video-url').value = video.url || '';
       document.getElementById('video-description').value = video.description || '';
+    }
+
+    // ============================================================
+    // PRINCIPAL'S WELCOME SECTION (photo + message)
+    // ============================================================
+
+    async function loadPrincipal() {
+      try {
+        const res = await fetch(`${API}/website/principal`);
+        const principal = await res.json();
+        renderPrincipalPhoto(principal);
+        document.getElementById('principal-name').value = principal.name || '';
+        document.getElementById('principal-role').value = principal.role || '';
+        document.getElementById('principal-message').value = principal.message || '';
+        document.getElementById('principal-signoff').value = principal.signoff || '';
+      } catch (e) {
+        showToast('❌ Hindi ma-load ang impormasyon ng punong-guro.');
+      }
+    }
+
+    function renderPrincipalPhoto(principal) {
+      const box = document.getElementById('principal-current-photo');
+      if (!principal || !principal.photo_url) {
+        box.innerHTML = '<div class="empty-state">Wala pang larawan na naka-set.</div>';
+        return;
+      }
+      box.innerHTML = `
+        <img src="${principal.photo_url}" alt="Larawan ng Punong-guro"
+             style="max-width:180px; border-radius:12px; display:block;" />
+      `;
+    }
+
+    async function savePrincipalPhoto() {
+      const fileInput = document.getElementById('principal-photo-input');
+      const statusEl = document.getElementById('principal-photo-status');
+      const btn = document.getElementById('principal-photo-btn');
+      const file = fileInput.files[0];
+
+      if (!file) {
+        statusEl.textContent = 'Pumili muna ng larawan.';
+        statusEl.style.color = '#B00020';
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('file', file);
+
+      btn.disabled = true;
+      btn.textContent = 'Ina-upload...';
+      statusEl.textContent = '';
+
+      try {
+        const res = await fetch(`${API}/website/principal/photo`, {
+          method: 'POST',
+          body: formData
+        });
+        if (!res.ok) {
+          const err = await res.json().catch(() => ({}));
+          throw new Error(err.detail || 'Upload failed');
+        }
+        const data = await res.json();
+        renderPrincipalPhoto({ photo_url: data.photo_url });
+        fileInput.value = '';
+        statusEl.textContent = '';
+        showToast('✅ Na-update ang larawan!');
+      } catch (e) {
+        statusEl.textContent = e.message || 'Hindi na-upload ang larawan. Subukan muli.';
+        statusEl.style.color = '#B00020';
+        showToast('❌ Hindi na-upload ang larawan.');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = '💾 I-Upload ang Larawan';
+      }
+    }
+
+    async function savePrincipalInfo() {
+      const name = document.getElementById('principal-name').value.trim();
+      const role = document.getElementById('principal-role').value.trim();
+      const message = document.getElementById('principal-message').value.trim();
+      const signoff = document.getElementById('principal-signoff').value.trim();
+
+      try {
+        await fetch(`${API}/website/principal`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name, role, message, signoff })
+        });
+        showToast('✅ Na-save ang impormasyon!');
+      } catch (e) {
+        showToast('❌ Hindi na-save. Subukan muli.');
+      }
     }
 
     // ============================================================
