@@ -967,6 +967,85 @@ footer {
 
 .choice-pill input { accent-color: var(--green-dark); cursor: pointer; }
 
+/* ============================================================
+   STUDENT TYPE SELECTOR — scoped only to .student-type-group.
+   Everything below targets this one section; it does not touch
+   .choice-pill anywhere else in the form.
+============================================================ */
+.student-type-group {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  width: 100%;
+}
+
+.student-type-group .choice-pill {
+  flex-direction: column !important;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  gap: 4px;
+  background: var(--bg);
+  border: 1.5px solid #D0E4D8;
+  border-radius: 14px;
+  padding: 18px 14px;
+  font-size: 0.88rem;
+  line-height: 1.35;
+  transition: border-color 0.25s ease, background 0.25s ease,
+              transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+              box-shadow 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: 0 0 0 rgba(64,145,108,0);
+}
+
+.student-type-group .choice-pill:hover {
+  border-color: var(--green-mid);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 22px rgba(27,67,50,0.12);
+}
+
+.student-type-group .choice-pill input {
+  width: 17px;
+  height: 17px;
+  margin-bottom: 2px;
+  transition: transform 0.2s ease;
+}
+
+.student-type-group .choice-pill:has(input:checked) {
+  border-color: var(--green-mid);
+  background: var(--green-light);
+  color: var(--green-dark);
+  font-weight: 600;
+  animation: studentTypeSelectPop 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 0 8px 20px rgba(27,67,50,0.14);
+}
+
+.student-type-group .choice-pill:has(input:checked) input {
+  transform: scale(1.12);
+}
+
+@keyframes studentTypeSelectPop {
+  0%   { transform: scale(0.96); }
+  55%  { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
+
+@media (max-width: 640px) {
+  .student-type-group {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .student-type-group .choice-pill,
+  .student-type-group .choice-pill input {
+    transition: none;
+    animation: none;
+  }
+  .student-type-group .choice-pill:hover {
+    transform: none;
+  }
+}
+
 .checkbox-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
@@ -1072,6 +1151,132 @@ footer {
   font-size: 0.72rem;
   color: var(--text-muted);
   font-style: italic;
+}
+
+.requirement-item.forced label { font-weight: 600; }
+.requirement-item.forced .opt-tag { display: none; }
+
+.requirement-item .req-label-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.req-upload-btn {
+  margin-left: auto;
+  flex-shrink: 0;
+  background: var(--white);
+  border: 1.5px solid var(--green-mid);
+  color: var(--green-dark);
+  border-radius: 16px;
+  padding: 5px 14px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.req-upload-btn:hover { background: var(--green-light); }
+
+.req-upload-btn.uploaded {
+  background: var(--green-dark);
+  border-color: var(--green-dark);
+  color: var(--white);
+}
+
+.req-check-icon { display: none; color: var(--green-dark); font-weight: 700; }
+.req-check-icon.show { display: inline; }
+
+.requirement-item.file-attached label { color: var(--green-dark); font-weight: 600; }
+
+/* ---- Uri ng Mag-aaral (student type) + old-student lookup ---- */
+.student-type-lookup {
+  margin-top: 16px;
+  background: var(--cream);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+}
+
+.student-type-lookup .form-note { margin-bottom: 12px; }
+
+.lookup-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.lookup-row input {
+  flex: 1;
+  min-width: 200px;
+}
+
+.lookup-status {
+  margin-top: 10px;
+  font-size: 0.85rem;
+  padding: 8px 12px;
+  border-radius: 8px;
+  display: none;
+}
+
+.lookup-status.show { display: block; }
+.lookup-status.success { background: var(--green-light); color: var(--green-dark); }
+.lookup-status.error { background: #FDECEC; color: #B00020; }
+
+/* ---- Per-requirement upload modal ---- */
+.req-modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(27,67,50,0.55);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.req-modal-overlay.show { display: flex; }
+
+.req-modal-box {
+  background: var(--white);
+  border-radius: 14px;
+  padding: 28px;
+  max-width: 420px;
+  width: 100%;
+  box-shadow: 0 12px 48px rgba(0,0,0,0.3);
+}
+
+.req-modal-box h3 {
+  color: var(--green-dark);
+  font-family: 'Playfair Display', serif;
+  font-size: 1.15rem;
+  margin-bottom: 6px;
+}
+
+.req-modal-box p { color: var(--text-muted); font-size: 0.85rem; margin-bottom: 18px; }
+
+.req-modal-preview {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  background: var(--green-light);
+  color: var(--green-dark);
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-size: 0.85rem;
+  margin-top: 14px;
+  font-weight: 600;
+}
+
+.req-modal-preview.show { display: flex; }
+
+.req-modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 22px;
+  flex-wrap: wrap;
 }
 
 /* ---- Signature row ---- */
@@ -1211,7 +1416,26 @@ footer {
 
             <!-- 1. SCHOOL YEAR & GRADE -->
             <div class="form-section">
-              <h3><span class="form-section-num">1</span>Taon ng Pag-aaral (School Year)</h3>
+              <h3><span class="form-section-num">1</span>Uri ng Mag-aaral</h3>
+              <div class="form-row">
+                <div class="choice-group student-type-group">
+                  <label class="choice-pill"><input type="radio" name="studentType" value="Bagong Mag-aaral" checked onchange="handleStudentTypeChange()" /> Bagong Mag-aaral</label>
+                  <label class="choice-pill"><input type="radio" name="studentType" value="Transferee" onchange="handleStudentTypeChange()" /> Transferee (mula sa ibang paaralan)</label>
+                  <label class="choice-pill"><input type="radio" name="studentType" value="Lumang Mag-aaral" onchange="handleStudentTypeChange()" /> Lumang Mag-aaral (dati nang naka-enroll dito)</label>
+                </div>
+              </div>
+              <div class="student-type-lookup" id="oldStudentLookupBlock" style="display:none;">
+                <p class="form-note">Ilagay ang inyong LRN o Student ID para awtomatikong mapuno ang natitirang bahagi ng form. Maaari pa rin itong i-edit pagkatapos.</p>
+                <div class="lookup-row">
+                  <input type="text" id="lookupValue" placeholder="LRN (12 digit) o Student ID (hal. 2026-0001)" />
+                  <button type="button" class="btn btn-outline" style="border-color:var(--green-mid); color:var(--green-dark);" onclick="lookupOldStudent()">🔍 Hanapin</button>
+                </div>
+                <p class="lookup-status" id="lookupStatus"></p>
+              </div>
+            </div>
+
+            <div class="form-section">
+              <h3><span class="form-section-num">2</span>Taon ng Pag-aaral (School Year)</h3>
               <div class="form-row-triple">
                 <div class="form-row">
                   <label>School Year <span class="req">*</span></label>
@@ -1243,9 +1467,9 @@ footer {
               </div>
             </div>
 
-            <!-- 2. PERSONAL INFO -->
+            <!-- 3. PERSONAL INFO -->
             <div class="form-section">
-              <h3><span class="form-section-num">2</span>Personal na Impormasyon ng Mag-aaral</h3>
+              <h3><span class="form-section-num">3</span>Personal na Impormasyon ng Mag-aaral</h3>
               <div class="form-row">
                 <label>PSA Birth Certificate No.</label>
                 <input type="text" id="psaNo" class="only-numbers" />
@@ -1313,7 +1537,7 @@ footer {
 
             <!-- 3. CURRENT ADDRESS -->
             <div class="form-section">
-              <h3><span class="form-section-num">3</span>Kasalukuyang Tirahan</h3>
+              <h3><span class="form-section-num">4</span>Kasalukuyang Tirahan</h3>
               <div class="form-row"><label>House No. / Street / Sitio <span class="req">*</span></label><input type="text" id="curStreet" required /></div>
               <div class="form-row-triple">
                 <div class="form-row">
@@ -1334,7 +1558,7 @@ footer {
 
             <!-- 4. PERMANENT ADDRESS -->
             <div class="form-section">
-              <h3><span class="form-section-num">4</span>Permanenteng Tirahan</h3>
+              <h3><span class="form-section-num">5</span>Permanenteng Tirahan</h3>
               <label class="checkbox-line" style="margin-bottom:14px;">
                 <input type="checkbox" id="sameAsCurrent" checked onchange="togglePermAddress()" />
                 Kapareho ng kasalukuyang tirahan
@@ -1361,7 +1585,7 @@ footer {
 
             <!-- 5. PARENT / GUARDIAN -->
             <div class="form-section">
-              <h3><span class="form-section-num">5</span>Impormasyon ng Magulang / Guardian</h3>
+              <h3><span class="form-section-num">6</span>Impormasyon ng Magulang / Guardian</h3>
               <p class="form-section-desc">Punan lamang ang mga naaangkop. Kailangan ng hindi bababa sa isang paraan ng pakikipag-ugnayan.</p>
 
               <p style="font-weight:600;color:var(--green-dark);font-size:0.85rem;margin-bottom:8px;">Ama</p>
@@ -1388,7 +1612,7 @@ footer {
 
             <!-- 6. SPECIAL NEEDS -->
             <div class="form-section">
-              <h3><span class="form-section-num">6</span>Learners with Disability</h3>
+              <h3><span class="form-section-num">7</span>Learners with Disability</h3>
               <div class="form-row">
                 <label>Mayroon bang special needs ang mag-aaral?</label>
                 <div class="choice-group">
@@ -1425,28 +1649,19 @@ footer {
               </div>
             </div>
 
-            <!-- 7. RETURNING LEARNER -->
-            <div class="form-section">
-              <h3><span class="form-section-num">7</span>Returning Learner (Balik-Aral)</h3>
-              <div class="form-row">
-                <label>Ito ba ay isang returning learner?</label>
-                <div class="choice-group">
-                  <label class="choice-pill"><input type="radio" name="returningLearner" value="Oo" onchange="toggleBlock('returningBlock', true)" /> Oo</label>
-                  <label class="choice-pill"><input type="radio" name="returningLearner" value="Hindi" checked onchange="toggleBlock('returningBlock', false)" /> Hindi, bagong mag-aaral</label>
-                </div>
-              </div>
-              <div class="conditional-block" id="returningBlock">
-                <div class="form-row-triple">
-                  <div class="form-row"><label>Huling School Year na Nag-aral</label><input type="text" id="lastSY" placeholder="hal. 2023-2024" /></div>
-                  <div class="form-row"><label>Huling Grade Level na Natapos</label><input type="text" id="lastGrade" /></div>
-                  <div class="form-row"><label>Huling Paaralang Pinasukan</label><input type="text" id="lastSchool" /></div>
-                </div>
+            <!-- LAST SCHOOL ATTENDED - shown only for Transferee -->
+            <div class="form-section" id="lastSchoolSection" style="display:none;">
+              <h3><span class="form-section-num">8</span>Huling Paaralang Pinasukan <span class="hint">para sa transferees</span></h3>
+              <div class="form-row-triple">
+                <div class="form-row"><label>Huling School Year na Nag-aral</label><input type="text" id="lastSY" placeholder="hal. 2023-2024" /></div>
+                <div class="form-row"><label>Huling Grade Level na Natapos</label><input type="text" id="lastGrade" /></div>
+                <div class="form-row"><label>Huling Paaralang Pinasukan</label><input type="text" id="lastSchool" /></div>
               </div>
             </div>
 
             <!-- 8. SHS -->
             <div class="form-section">
-              <h3><span class="form-section-num">8</span>Senior High School <span class="hint">para sa Grade 11&#8211;12 lamang</span></h3>
+              <h3><span class="form-section-num">9</span>Senior High School <span class="hint">para sa Grade 11&#8211;12 lamang</span></h3>
               <div class="form-row-triple">
                 <div class="form-row">
                   <label>Trimester</label>
@@ -1475,7 +1690,7 @@ footer {
 
             <!-- 9. DISTANCE LEARNING -->
             <div class="form-section">
-              <h3><span class="form-section-num">9</span>Kagustuhan sa Distance Learning Modality</h3>
+              <h3><span class="form-section-num">10</span>Kagustuhan sa Distance Learning Modality</h3>
               <p class="form-section-desc">Piliin ang paraan ng pagkatuto na pinaka-angkop kung kinakailangan ng alternative delivery mode.</p>
               <div class="checkbox-grid">
                 <label class="checkbox-line"><input type="radio" name="modality" value="Blended (Combination)" /> Blended (Combination)</label>
@@ -1490,7 +1705,7 @@ footer {
 
             <!-- 10. DECLARATION -->
             <div class="form-section">
-              <h3><span class="form-section-num">10</span>Deklarasyon ng Magulang / Guardian</h3>
+              <h3><span class="form-section-num">11</span>Deklarasyon ng Magulang / Guardian</h3>
               <div class="form-attestation">
                 Sa pag-type ng aking buong pangalan sa ibaba, pinapatunayan ko na totoo at tama ang lahat ng impormasyong ibinigay sa form na ito, bilang kapalit ng aktwal na lagda na kokolektahin ng paaralan sa araw ng personal na pagpapasa ng mga dokumento.
               </div>
@@ -1510,17 +1725,18 @@ footer {
               </div>
             </div>
 
-            <!-- REQUIREMENTS CHECKLIST -->
-            <div class="requirements-panel">
+            <!-- REQUIREMENTS CHECKLIST - hidden entirely for Lumang Mag-aaral -->
+            <div class="requirements-panel" id="requirementsSection">
               <h3>Requirements Checklist</h3>
-              <p class="form-note">I-check ang mga dokumentong nasa inyo na. Makikita ito ng aming registrar para malaman kung ano pa ang kailangang ihanda.</p>
-              <div class="requirement-item"><input type="checkbox" id="req1" /><label for="req1">PSA Birth Certificate</label></div>
-              <div class="requirement-item"><input type="checkbox" id="req2" /><label for="req2">Report Card / Form 138 <span class="opt-tag">(para sa transferees)</span></label></div>
-              <div class="requirement-item"><input type="checkbox" id="req3" /><label for="req3">Good Moral Certificate <span class="opt-tag">(para sa transferees)</span></label></div>
-              <div class="requirement-item"><input type="checkbox" id="req4" /><label for="req4">Barangay Certificate <span class="opt-tag">(kung walang PSA Birth Certificate)</span></label></div>
-              <div class="requirement-item"><input type="checkbox" id="req5" /><label for="req5">2x2 ID Photo</label></div>
-              <div class="requirement-item"><input type="checkbox" id="req6" /><label for="req6">PWD ID <span class="opt-tag">(kung naaangkop)</span></label></div>
-              <div class="requirement-item"><input type="checkbox" id="req7" /><label for="req7">4Ps Household ID <span class="opt-tag">(kung naaangkop)</span></label></div>
+              <p class="form-note">I-click ang pangalan ng dokumento para i-upload ang file. PSA Birth Certificate at 2x2 ID Photo ay kinakailangan para sa lahat; Report Card at Good Moral ay kinakailangan para sa transferees.</p>
+              <div class="requirement-item" id="reqRow1"><input type="checkbox" id="req1" onchange="handleRequirementCheckChange(1)" /><div class="req-label-wrap"><label for="req1">PSA Birth Certificate</label><span class="req-check-icon" id="reqCheck1">✅</span><button type="button" class="req-upload-btn" id="reqUploadBtn1" onclick="openRequirementModal(1, 'PSA Birth Certificate')">📎 I-upload</button></div></div>
+              <div class="requirement-item" id="reqRow2"><input type="checkbox" id="req2" onchange="handleRequirementCheckChange(2)" /><div class="req-label-wrap"><label for="req2">Report Card / Form 138 <span class="opt-tag">(para sa transferees)</span></label><span class="req-check-icon" id="reqCheck2">✅</span><button type="button" class="req-upload-btn" id="reqUploadBtn2" onclick="openRequirementModal(2, 'Report Card / Form 138')">📎 I-upload</button></div></div>
+              <div class="requirement-item" id="reqRow3"><input type="checkbox" id="req3" onchange="handleRequirementCheckChange(3)" /><div class="req-label-wrap"><label for="req3">Good Moral Certificate <span class="opt-tag">(para sa transferees)</span></label><span class="req-check-icon" id="reqCheck3">✅</span><button type="button" class="req-upload-btn" id="reqUploadBtn3" onclick="openRequirementModal(3, 'Good Moral Certificate')">📎 I-upload</button></div></div>
+              <div class="requirement-item" id="reqRow4"><input type="checkbox" id="req4" onchange="handleRequirementCheckChange(4)" /><div class="req-label-wrap"><label for="req4">Barangay Certificate <span class="opt-tag">(kung walang PSA Birth Certificate)</span></label><span class="req-check-icon" id="reqCheck4">✅</span><button type="button" class="req-upload-btn" id="reqUploadBtn4" onclick="openRequirementModal(4, 'Barangay Certificate')">📎 I-upload</button></div></div>
+              <div class="requirement-item" id="reqRow5"><input type="checkbox" id="req5" onchange="handleRequirementCheckChange(5)" /><div class="req-label-wrap"><label for="req5">2x2 ID Photo</label><span class="req-check-icon" id="reqCheck5">✅</span><button type="button" class="req-upload-btn" id="reqUploadBtn5" onclick="openRequirementModal(5, '2x2 ID Photo')">📎 I-upload</button></div></div>
+              <div class="requirement-item" id="reqRow6"><input type="checkbox" id="req6" onchange="handleRequirementCheckChange(6)" /><div class="req-label-wrap"><label for="req6">PWD ID <span class="opt-tag">(kung naaangkop)</span></label><span class="req-check-icon" id="reqCheck6">✅</span><button type="button" class="req-upload-btn" id="reqUploadBtn6" onclick="openRequirementModal(6, 'PWD ID')">📎 I-upload</button></div></div>
+              <div class="requirement-item" id="reqRow7"><input type="checkbox" id="req7" onchange="handleRequirementCheckChange(7)" /><div class="req-label-wrap"><label for="req7">4Ps Household ID <span class="opt-tag">(kung naaangkop)</span></label><span class="req-check-icon" id="reqCheck7">✅</span><button type="button" class="req-upload-btn" id="reqUploadBtn7" onclick="openRequirementModal(7, '4Ps Household ID')">📎 I-upload</button></div></div>
+              <p class="lookup-status error" id="requirementsValidationMsg" style="margin-top:14px;"></p>
             </div>
 
             <button type="submit" id="mainSubmitBtn" class="btn btn-primary" style="width:100%; justify-content:center; margin-top:24px;">Isumite ang Enrollment Form</button>
@@ -1544,6 +1760,23 @@ footer {
       </div>
     </div>
   </section>
+
+  <!-- ============================================================
+       PER-REQUIREMENT DOCUMENT UPLOAD MODAL
+  ============================================================ -->
+  <div id="reqModalOverlay" class="req-modal-overlay">
+    <div class="req-modal-box">
+      <h3 id="reqModalTitle">I-upload ang Dokumento</h3>
+      <p>Pumili ng litrato o PDF ng dokumentong ito. Kapag na-upload, magpapakita ng berdeng check bilang kumpirmasyon.</p>
+      <input type="file" id="reqModalFileInput" accept=".jpg,.jpeg,.png,.webp,.pdf,image/*,application/pdf" onchange="handleRequirementFileSelect(event)" />
+      <div class="req-modal-preview" id="reqModalPreview">
+        <span>✅</span><span id="reqModalPreviewName"></span>
+      </div>
+      <div class="req-modal-actions">
+        <button type="button" class="btn btn-outline" style="border-color:var(--green-mid); color:var(--green-dark);" onclick="closeRequirementModal()">Isara</button>
+      </div>
+    </div>
+  </div>
 
   <!-- ============================================================
        CONFIRMATION MODAL &#8212; shown before actual submission
@@ -1658,6 +1891,230 @@ function initSite(activePage) {
 
     let lastSummary = '';
 
+    // ============================================================
+    // STUDENT TYPE (Bagong Mag-aaral / Transferee / Lumang Mag-aaral)
+    // ============================================================
+    function handleStudentTypeChange() {
+      const type = document.querySelector('input[name="studentType"]:checked')?.value;
+
+      document.getElementById('oldStudentLookupBlock').style.display = type === 'Lumang Mag-aaral' ? 'block' : 'none';
+      document.getElementById('requirementsSection').style.display = type === 'Lumang Mag-aaral' ? 'none' : 'block';
+      document.getElementById('lastSchoolSection').style.display = type === 'Transferee' ? 'block' : 'none';
+
+      // PSA Birth Certificate + 2x2 Photo are required for everyone except
+      // old students (whose checklist section is hidden entirely above).
+      forceRequirement(1, type !== 'Lumang Mag-aaral');
+      forceRequirement(5, type !== 'Lumang Mag-aaral');
+
+      // Report Card + Good Moral are only required for transferees; reset
+      // them back to optional/unchecked (and drop any attached file) when
+      // switching away from Transferee.
+      const isTransferee = type === 'Transferee';
+      forceRequirement(2, isTransferee);
+      forceRequirement(3, isTransferee);
+      if (!isTransferee) {
+        delete uploadedRequirementFiles[2];
+        delete uploadedRequirementFiles[3];
+        updateRequirementRowUI(2);
+        updateRequirementRowUI(3);
+      }
+    }
+
+    // Checks (or unchecks) and locks a requirement checkbox based on
+    // student type, without touching any file the person may have
+    // already attached.
+    function forceRequirement(reqId, forceOn) {
+      const checkbox = document.getElementById(`req${reqId}`);
+      const row = document.getElementById(`reqRow${reqId}`);
+      if (forceOn) {
+        checkbox.checked = true;
+        checkbox.disabled = true;
+        row.classList.add('forced');
+      } else {
+        checkbox.disabled = false;
+        row.classList.remove('forced');
+        if (!uploadedRequirementFiles[reqId]) checkbox.checked = false;
+      }
+      updateRequirementRowUI(reqId);
+    }
+
+    // ============================================================
+    // PER-REQUIREMENT DOCUMENT UPLOAD MODAL
+    // ============================================================
+    let uploadedRequirementFiles = {}; // { reqId: File }
+    let currentModalReqId = null;
+
+    function openRequirementModal(reqId, reqName) {
+      currentModalReqId = reqId;
+      document.getElementById('reqModalTitle').textContent = `I-upload: ${reqName}`;
+      document.getElementById('reqModalFileInput').value = '';
+      const existing = uploadedRequirementFiles[reqId];
+      const preview = document.getElementById('reqModalPreview');
+      if (existing) {
+        document.getElementById('reqModalPreviewName').textContent = existing.name;
+        preview.classList.add('show');
+      } else {
+        preview.classList.remove('show');
+      }
+      document.getElementById('reqModalOverlay').classList.add('show');
+    }
+
+    function closeRequirementModal() {
+      document.getElementById('reqModalOverlay').classList.remove('show');
+      currentModalReqId = null;
+    }
+
+    function handleRequirementFileSelect(event) {
+      const file = event.target.files[0];
+      if (!file || currentModalReqId === null) return;
+
+      uploadedRequirementFiles[currentModalReqId] = file;
+      document.getElementById(`req${currentModalReqId}`).checked = true;
+      updateRequirementRowUI(currentModalReqId);
+
+      document.getElementById('reqModalPreviewName').textContent = file.name;
+      document.getElementById('reqModalPreview').classList.add('show');
+
+      // Brief pause so the person sees the confirmation before it closes.
+      setTimeout(closeRequirementModal, 500);
+    }
+
+    // Syncs a requirement row's checkmark/upload-button/label styling to
+    // whether a file is currently attached for it.
+    function updateRequirementRowUI(reqId) {
+      const row = document.getElementById(`reqRow${reqId}`);
+      const checkIcon = document.getElementById(`reqCheck${reqId}`);
+      const uploadBtn = document.getElementById(`reqUploadBtn${reqId}`);
+      const hasFile = !!uploadedRequirementFiles[reqId];
+
+      row.classList.toggle('file-attached', hasFile);
+      checkIcon.classList.toggle('show', hasFile);
+      uploadBtn.classList.toggle('uploaded', hasFile);
+      uploadBtn.textContent = hasFile ? '📎 Palitan' : '📎 I-upload';
+    }
+
+    // If a checkbox is manually unchecked, drop any file already attached
+    // to it - they're saying they no longer have that document.
+    function handleRequirementCheckChange(reqId) {
+      if (!document.getElementById(`req${reqId}`).checked) {
+        delete uploadedRequirementFiles[reqId];
+        updateRequirementRowUI(reqId);
+      }
+    }
+
+    // Blocks submission until every CHECKED requirement has a file attached.
+    function validateRequirementUploads() {
+      const msg = document.getElementById('requirementsValidationMsg');
+      if (document.getElementById('requirementsSection').style.display === 'none') {
+        msg.classList.remove('show');
+        return true; // old student - checklist doesn't apply
+      }
+      const missing = [];
+      for (let i = 1; i <= 7; i++) {
+        const checkbox = document.getElementById(`req${i}`);
+        if (checkbox.checked && !uploadedRequirementFiles[i]) {
+          missing.push(checkbox.closest('.requirement-item').querySelector('label').textContent.trim());
+        }
+      }
+      if (missing.length > 0) {
+        msg.textContent = `Mangyaring mag-upload ng file para sa: ${missing.join(', ')}`;
+        msg.classList.add('show');
+        msg.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        return false;
+      }
+      msg.classList.remove('show');
+      return true;
+    }
+
+    // ============================================================
+    // OLD STUDENT LOOKUP (LRN / Student ID autofill)
+    // ============================================================
+    async function lookupOldStudent() {
+      const raw = document.getElementById('lookupValue').value.trim();
+      const statusEl = document.getElementById('lookupStatus');
+      if (!raw) {
+        statusEl.textContent = 'Ilagay muna ang LRN o Student ID.';
+        statusEl.className = 'lookup-status show error';
+        return;
+      }
+
+      // LRNs are 12 digits (numeric only); Student IDs look like "2026-0001".
+      const isLikelyLRN = /^\d{6,}$/.test(raw);
+      const API = 'https://tctar-api.onrender.com';
+      const param = isLikelyLRN ? `lrn=${encodeURIComponent(raw)}` : `student_id_number=${encodeURIComponent(raw)}`;
+
+      statusEl.textContent = 'Hinahanap...';
+      statusEl.className = 'lookup-status show';
+
+      try {
+        const res = await fetch(`${API}/students/lookup?${param}`);
+        if (!res.ok) {
+          statusEl.textContent = 'Walang nahanap na record para sa LRN/Student ID na iyan. Maaari pa rin kayong magpatuloy nang manu-mano.';
+          statusEl.className = 'lookup-status show error';
+          return;
+        }
+        const data = await res.json();
+        applyLookupDataToForm(data);
+        statusEl.textContent = `Nahanap! Na-fill up na ang form para kay ${data.first_name} ${data.last_name}. Maaari pa rin itong i-edit.`;
+        statusEl.className = 'lookup-status show success';
+      } catch (e) {
+        statusEl.textContent = 'May problema sa paghahanap. Subukan muli o magpatuloy nang manu-mano.';
+        statusEl.className = 'lookup-status show error';
+      }
+    }
+
+    // Fills in every matching field from a /students/lookup response.
+    // Address dropdowns (province/city/barangay) are intentionally left
+    // for the person to reselect, since they're dynamically populated and
+    // can't be safely pre-set from a plain text value.
+    function applyLookupDataToForm(data) {
+      const set = (id, value) => {
+        const el = document.getElementById(id);
+        if (el && value !== null && value !== undefined) el.value = value;
+      };
+      const setRadio = (name, value) => {
+        if (!value) return;
+        const input = document.querySelector(`input[name="${name}"][value="${value}"]`);
+        if (input) input.checked = true;
+      };
+
+      set('firstName', data.first_name);
+      set('lastName', data.last_name);
+      set('middleName', data.middle_name);
+      set('extName', data.ext_name);
+      set('lrn', data.lrn);
+      set('psaNo', data.psa_no);
+      set('birthdate', data.birthdate ? data.birthdate.substring(0, 10) : null);
+      if (data.birthdate) document.getElementById('birthdate').dispatchEvent(new Event('change'));
+      setRadio('sex', data.sex);
+      set('placeOfBirth', data.place_of_birth);
+      set('religion', data.religion);
+      set('ipGroup', data.ip_group);
+      setRadio('ipMember', data.ip_member);
+      set('fourPsId', data.four_ps_id);
+      setRadio('fourPs', data.four_ps);
+
+      set('curStreet', data.current_street);
+      set('curZip', data.current_zip);
+
+      set('fatherLast', data.father_last_name);
+      set('fatherFirst', data.father_first_name);
+      set('fatherContact', data.father_contact);
+      set('motherLast', data.mother_last_name);
+      set('motherFirst', data.mother_first_name);
+      set('motherContact', data.mother_contact);
+      set('guardianLast', data.guardian_last_name);
+      set('guardianFirst', data.guardian_first_name);
+      set('guardianContact', data.guardian_contact);
+
+      setRadio('specialNeeds', data.special_needs);
+      setRadio('pwdId', data.pwd_id);
+      set('pwdIdNum', data.pwd_id_number);
+
+      set('contactNumber', data.phone_number);
+      set('contactEmail', data.email);
+    }
+
     // Reusable input restrictions: letters-only (names/places) and numbers-only (IDs/phones)
     document.querySelectorAll('.only-letters').forEach(el => {
       el.addEventListener('input', function () {
@@ -1689,6 +2146,7 @@ function initSite(activePage) {
     document.getElementById('enrollForm').addEventListener('submit', function (e) {
       e.preventDefault();
       if (!this.checkValidity()) { this.reportValidity(); return; }
+      if (!validateRequirementUploads()) return;
       document.getElementById('confirmModalOverlay').style.display = 'flex';
     });
 
@@ -1741,8 +2199,8 @@ function initSite(activePage) {
         `Diagnosis: ${checks('disability')}`,
         `PWD ID: ${radio('pwdId')} ${v('pwdIdNum') ? '- ' + v('pwdIdNum') : ''}`,
         ``,
-        `--- Returning Learner ---`,
-        `${radio('returningLearner')} ${v('lastSY') ? '| Huling SY: ' + v('lastSY') + ', Grade: ' + v('lastGrade') + ', School: ' + v('lastSchool') : ''}`,
+        `--- Uri ng Mag-aaral ---`,
+        `${radio('studentType')} ${v('lastSY') ? '| Huling SY: ' + v('lastSY') + ', Grade: ' + v('lastGrade') + ', School: ' + v('lastSchool') : ''}`,
         ``,
         `--- Senior High School ---`,
         `Trimester: ${radio('trimester')} | Track: ${v('shsTrack') || '-'} | Strand: ${v('shsStrand') || '-'}`,
@@ -1828,7 +2286,7 @@ function initSite(activePage) {
         disability: checks('disability'),
         pwd_id: radio('pwdId'),
         pwd_id_number: v('pwdIdNum'),
-        returning_learner: radio('returningLearner'),
+        returning_learner: radio('studentType'),
         last_school_year: v('lastSY'),
         last_grade: v('lastGrade'),
         last_school: v('lastSchool'),
@@ -1850,10 +2308,48 @@ function initSite(activePage) {
           body: JSON.stringify(payload)
         });
         if (!res.ok) throw new Error('Submission failed');
+        const result = await res.json();
         console.log('Application submitted to registrar system successfully.');
+
+        // Upload any attached requirement files now that we have a real
+        // application_id to attach them to. Skipped entirely for old
+        // students, since the checklist section is hidden for them.
+        if (Object.keys(uploadedRequirementFiles).length > 0) {
+          await uploadPendingRequirementDocuments(result.application_id);
+        }
       } catch (e) {
         console.error('Failed to submit application to registrar system:', e);
         document.getElementById('fallbackBlock').style.display = 'block';
+      }
+    }
+
+    // Matches each locally-attached file (keyed by requirement id 1-7) to
+    // its actual application_requirements row id, then uploads it.
+    async function uploadPendingRequirementDocuments(applicationId) {
+      const API = 'https://tctar-api.onrender.com';
+      try {
+        const res = await fetch(`${API}/applications/${applicationId}`);
+        if (!res.ok) throw new Error('Could not fetch application for document upload');
+        const application = await res.json();
+
+        // req1-7 map 1:1 to requirement_id in the database, in the same
+        // order they're seeded server-side for this application type.
+        for (const item of application.requirements) {
+          const file = uploadedRequirementFiles[item.requirement_id];
+          if (!file) continue;
+
+          const formData = new FormData();
+          formData.append('file', file);
+          const uploadRes = await fetch(`${API}/application_requirements/${item.id}/document`, {
+            method: 'POST',
+            body: formData
+          });
+          if (!uploadRes.ok) {
+            console.error(`Failed to upload document for requirement ${item.requirement_id}`);
+          }
+        }
+      } catch (e) {
+        console.error('Document upload step failed:', e);
       }
     }
 
@@ -1873,19 +2369,32 @@ function initSite(activePage) {
 
   <script src="ph_locations_data.js"></script>
   <script>
-    /* ---- Province / City / Barangay cascading dropdowns ---- */
+    /* ---- Province / City / Barangay cascading dropdowns ----
+       Guarded: if ph_locations_data.js failed to load (missing file,
+       wrong path, opened directly instead of via a server, etc.),
+       these functions log a warning and no-op instead of throwing —
+       an uncaught error here must never be allowed to stop the rest
+       of this script block (phone/email validation, autofill, etc.)
+       from running. */
     function populateProvinces(selectId) {
       const sel = document.getElementById(selectId);
       if (!sel) return;
+      if (typeof PH_LOCATIONS === 'undefined') {
+        console.warn('PH_LOCATIONS is not defined — ph_locations_data.js did not load. Province/City/Barangay dropdowns will be unavailable.');
+        sel.innerHTML = '<option value="">Location data unavailable</option>';
+        return;
+      }
       const options = ['<option value="">Piliin...</option>']
         .concat(PH_LOCATIONS.provinces.map(p => `<option value="${p}">${p}</option>`));
       sel.innerHTML = options.join('');
     }
 
     function populateCities(provinceId, cityId, barangayId) {
+      if (typeof PH_LOCATIONS === 'undefined') return;
       const provinceSel = document.getElementById(provinceId);
       const citySel = document.getElementById(cityId);
       const barangaySel = document.getElementById(barangayId);
+      if (!provinceSel || !citySel || !barangaySel) return;
       const province = provinceSel.value;
       const cities = (province && PH_LOCATIONS.cities[province]) ? PH_LOCATIONS.cities[province] : [];
       citySel.innerHTML = ['<option value="">Piliin...</option>'].concat(cities.map(c => `<option value="${c}">${c}</option>`)).join('');
@@ -1893,9 +2402,11 @@ function initSite(activePage) {
     }
 
     function populateBarangays(provinceId, cityId, barangayId) {
+      if (typeof PH_LOCATIONS === 'undefined') return;
       const provinceSel = document.getElementById(provinceId);
       const citySel = document.getElementById(cityId);
       const barangaySel = document.getElementById(barangayId);
+      if (!provinceSel || !citySel || !barangaySel) return;
       const key = provinceSel.value + '|' + citySel.value;
       const barangays = (citySel.value && PH_LOCATIONS.barangays[key]) ? PH_LOCATIONS.barangays[key] : [];
       barangaySel.innerHTML = ['<option value="">Piliin...</option>'].concat(barangays.map(b => `<option value="${b}">${b}</option>`)).join('');
@@ -1911,7 +2422,14 @@ function initSite(activePage) {
         populateCities('curProvince', 'curMunicipality', 'curBarangay');
       }
     })();
+  </script>
 
+  <!-- Isolated on purpose: this block must keep running even if the
+       address-dropdown script above hits a problem (e.g. missing
+       ph_locations_data.js). Contact/email validation and the
+       parent/guardian autofill are unrelated features and should
+       never go down together with the address dropdowns. -->
+  <script>
     /* ---- Phone number validation: exactly 11 digits, checked on blur ---- */
     document.querySelectorAll('.phone-field').forEach(el => {
       el.addEventListener('input', function () {
