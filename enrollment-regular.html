@@ -2323,8 +2323,19 @@ function initSite(activePage) {
       }
     }
 
-    // Matches each locally-attached file (keyed by requirement id 1-7) to
-    // its actual application_requirements row id, then uploads it.
+    // Matches each locally-attached file (keyed by requirement id 1-7,
+    // matching this form's fixed checklist order) to its actual
+    // application_requirements row id, then uploads it.
+    //
+    // IMPORTANT: this matches by POSITION in the returned array, not by
+    // the database's requirement_id. requirement_id is just whatever
+    // auto-increment number that row happens to have in the shared
+    // `requirements` table (which also holds ALS-specific rows) - it is
+    // NOT guaranteed to equal 1-7. The backend always returns this list
+    // "ORDER BY r.id" for a given application_type, so as long as the
+    // requirements table isn't reordered, position 0 is always PSA Birth
+    // Certificate, position 1 is always Report Card, and so on, matching
+    // this form's req1..req7 checklist exactly.
     async function uploadPendingRequirementDocuments(applicationId) {
       const API = 'https://tctar-api.onrender.com';
       try {
@@ -2332,10 +2343,10 @@ function initSite(activePage) {
         if (!res.ok) throw new Error('Could not fetch application for document upload');
         const application = await res.json();
 
-        // req1-7 map 1:1 to requirement_id in the database, in the same
-        // order they're seeded server-side for this application type.
-        for (const item of application.requirements) {
-          const file = uploadedRequirementFiles[item.requirement_id];
+        for (let index = 0; index < application.requirements.length; index++) {
+          const item = application.requirements[index];
+          const reqId = index + 1; // 1-based, matches req1..req7
+          const file = uploadedRequirementFiles[reqId];
           if (!file) continue;
 
           const formData = new FormData();
@@ -2345,7 +2356,7 @@ function initSite(activePage) {
             body: formData
           });
           if (!uploadRes.ok) {
-            console.error(`Failed to upload document for requirement ${item.requirement_id}`);
+            console.error(`Failed to upload document for requirement position ${reqId} (item id ${item.id})`);
           }
         }
       } catch (e) {
