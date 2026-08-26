@@ -911,6 +911,19 @@ footer {
   .form-row-triple { grid-template-columns: 1fr; }
 }
 
+/* Used only for the address blocks below, which need a 4th column
+   (District) between Municipality and Barangay. Kept separate from
+   .form-row-triple so every other 3-column section is unaffected. */
+.form-row-quad {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr;
+  gap: 14px;
+}
+
+@media (max-width: 640px) {
+  .form-row-quad { grid-template-columns: 1fr; }
+}
+
 .form-row label .req { color: #C0392B; }
 
 .form-row .hint {
@@ -1458,13 +1471,6 @@ footer {
                   </select>
                 </div>
               </div>
-              <div class="form-row">
-                <label>Graded / Non-Graded</label>
-                <div class="choice-group">
-                  <label class="choice-pill"><input type="radio" name="gradedStatus" value="Graded" checked /> Graded</label>
-                  <label class="choice-pill"><input type="radio" name="gradedStatus" value="Non-Graded" /> Non-Graded</label>
-                </div>
-              </div>
             </div>
 
             <!-- 3. PERSONAL INFO -->
@@ -1539,14 +1545,18 @@ footer {
             <div class="form-section">
               <h3><span class="form-section-num">4</span>Kasalukuyang Tirahan</h3>
               <div class="form-row"><label>House No. / Street / Sitio <span class="req">*</span></label><input type="text" id="curStreet" required /></div>
-              <div class="form-row-triple">
+              <div class="form-row-quad">
                 <div class="form-row">
                   <label>Probinsya <span class="req">*</span></label>
-                  <select id="curProvince" required onchange="populateCities('curProvince','curMunicipality','curBarangay')"></select>
+                  <select id="curProvince" required onchange="populateCities('curProvince','curMunicipality','curDistrict','curBarangay')"></select>
                 </div>
                 <div class="form-row">
                   <label>Munisipyo/Lungsod <span class="req">*</span></label>
-                  <select id="curMunicipality" required onchange="populateBarangays('curProvince','curMunicipality','curBarangay')"><option value="">Piliin muna ang probinsya</option></select>
+                  <select id="curMunicipality" required onchange="populateDistricts('curProvince','curMunicipality','curDistrict','curBarangay')"><option value="">Piliin muna ang probinsya</option></select>
+                </div>
+                <div class="form-row">
+                  <label>District</label>
+                  <select id="curDistrict" onchange="populateBarangaysFromDistrict('curProvince','curMunicipality','curDistrict','curBarangay')" disabled><option value="">Piliin muna ang munisipyo/lungsod</option></select>
                 </div>
                 <div class="form-row">
                   <label>Barangay <span class="req">*</span></label>
@@ -1565,14 +1575,18 @@ footer {
               </label>
               <div id="permAddressFields" style="display:none;">
                 <div class="form-row"><label>House No. / Street / Sitio</label><input type="text" id="permStreet" /></div>
-                <div class="form-row-triple">
+                <div class="form-row-quad">
                   <div class="form-row">
                     <label>Probinsya</label>
-                    <select id="permProvince" onchange="populateCities('permProvince','permMunicipality','permBarangay')"></select>
+                    <select id="permProvince" onchange="populateCities('permProvince','permMunicipality','permDistrict','permBarangay')"></select>
                   </div>
                   <div class="form-row">
                     <label>Munisipyo/Lungsod</label>
-                    <select id="permMunicipality" onchange="populateBarangays('permProvince','permMunicipality','permBarangay')"><option value="">Piliin muna ang probinsya</option></select>
+                    <select id="permMunicipality" onchange="populateDistricts('permProvince','permMunicipality','permDistrict','permBarangay')"><option value="">Piliin muna ang probinsya</option></select>
+                  </div>
+                  <div class="form-row">
+                    <label>District</label>
+                    <select id="permDistrict" onchange="populateBarangaysFromDistrict('permProvince','permMunicipality','permDistrict','permBarangay')" disabled><option value="">Piliin muna ang munisipyo/lungsod</option></select>
                   </div>
                   <div class="form-row">
                     <label>Barangay</label>
@@ -2118,7 +2132,7 @@ function initSite(activePage) {
     // Reusable input restrictions: letters-only (names/places) and numbers-only (IDs/phones)
     document.querySelectorAll('.only-letters').forEach(el => {
       el.addEventListener('input', function () {
-        this.value = this.value.replace(/[^a-zA-Z&#241;&#209;\s.'-]/g, '');
+        this.value = this.value.replace(/[^a-zA-Z\u00F1\u00D1\s.'-]/g, '');
       });
     });
     document.querySelectorAll('.only-numbers').forEach(el => {
@@ -2173,7 +2187,7 @@ function initSite(activePage) {
 
       const lines = [
         `=== BASIC EDUCATION ENROLLMENT FORM ===`,
-        `School Year: ${v('schoolYear')} | LRN: ${v('lrn') || '-'} | Grade Level: ${v('gradeLevel')} (${radio('gradedStatus')})`,
+        `School Year: ${v('schoolYear')} | LRN: ${v('lrn') || '-'} | Grade Level: ${v('gradeLevel')}`,
         ``,
         `--- Personal Information ---`,
         `PSA Birth Cert No.: ${v('psaNo') || '-'}`,
@@ -2184,10 +2198,10 @@ function initSite(activePage) {
         `4Ps Household: ${radio('fourPs')} ${v('fourPsId') ? '- ID: ' + v('fourPsId') : ''}`,
         ``,
         `--- Kasalukuyang Tirahan ---`,
-        `${v('curStreet')}, ${v('curBarangay')}, ${v('curMunicipality')}, ${v('curProvince')} ${v('curZip')}`,
+        `${v('curStreet')}, ${v('curBarangay')}${v('curDistrict') ? ' (' + v('curDistrict') + ')' : ''}, ${v('curMunicipality')}, ${v('curProvince')} ${v('curZip')}`,
         ``,
         `--- Permanenteng Tirahan ---`,
-        document.getElementById('sameAsCurrent').checked ? 'Kapareho ng kasalukuyang tirahan' : `${v('permStreet')}, ${v('permBarangay')}, ${v('permMunicipality')}, ${v('permProvince')} ${v('permZip')}`,
+        document.getElementById('sameAsCurrent').checked ? 'Kapareho ng kasalukuyang tirahan' : `${v('permStreet')}, ${v('permBarangay')}${v('permDistrict') ? ' (' + v('permDistrict') + ')' : ''}, ${v('permMunicipality')}, ${v('permProvince')} ${v('permZip')}`,
         ``,
         `--- Magulang / Guardian ---`,
         `Ama: ${v('fatherLast')} ${v('fatherFirst')} | Contact: ${v('fatherContact') || '-'}`,
@@ -2245,7 +2259,6 @@ function initSite(activePage) {
         ].filter(x => x !== null),
 
         lrn: v('lrn'),
-        graded_status: radio('gradedStatus'),
         psa_no: v('psaNo'),
         middle_name: v('middleName'),
         ext_name: v('extName'),
@@ -2263,12 +2276,14 @@ function initSite(activePage) {
         current_street: v('curStreet'),
         current_barangay: v('curBarangay'),
         current_municipality: v('curMunicipality'),
+        current_district: v('curDistrict'),
         current_province: v('curProvince'),
         current_zip: v('curZip'),
         permanent_same_as_current: document.getElementById('sameAsCurrent').checked,
         permanent_street: document.getElementById('sameAsCurrent').checked ? null : v('permStreet'),
         permanent_barangay: document.getElementById('sameAsCurrent').checked ? null : v('permBarangay'),
         permanent_municipality: document.getElementById('sameAsCurrent').checked ? null : v('permMunicipality'),
+        permanent_district: document.getElementById('sameAsCurrent').checked ? null : v('permDistrict'),
         permanent_province: document.getElementById('sameAsCurrent').checked ? null : v('permProvince'),
         permanent_zip: document.getElementById('sameAsCurrent').checked ? null : v('permZip'),
 
@@ -2400,16 +2415,68 @@ function initSite(activePage) {
       sel.innerHTML = options.join('');
     }
 
-    function populateCities(provinceId, cityId, barangayId) {
+    function populateCities(provinceId, cityId, districtId, barangayId) {
       if (typeof PH_LOCATIONS === 'undefined') return;
       const provinceSel = document.getElementById(provinceId);
       const citySel = document.getElementById(cityId);
+      const districtSel = document.getElementById(districtId);
       const barangaySel = document.getElementById(barangayId);
-      if (!provinceSel || !citySel || !barangaySel) return;
+      if (!provinceSel || !citySel || !districtSel || !barangaySel) return;
       const province = provinceSel.value;
       const cities = (province && PH_LOCATIONS.cities[province]) ? PH_LOCATIONS.cities[province] : [];
       citySel.innerHTML = ['<option value="">Piliin...</option>'].concat(cities.map(c => `<option value="${c}">${c}</option>`)).join('');
+      districtSel.innerHTML = '<option value="">Piliin muna ang munisipyo/lungsod</option>';
+      districtSel.disabled = true;
       barangaySel.innerHTML = '<option value="">Piliin muna ang munisipyo/lungsod</option>';
+    }
+
+    // Most municipalities have no district breakdown at all - District
+    // isn't a universal concept like Province/Municipality/Barangay, it's
+    // specific to how a handful of cities (currently just Iloilo City)
+    // organize their own barangays internally. For everywhere else, the
+    // District dropdown stays disabled with a plain "N/A" and Barangay
+    // populates directly from the full city list, same as before this
+    // feature existed.
+    function populateDistricts(provinceId, cityId, districtId, barangayId) {
+      if (typeof PH_LOCATIONS === 'undefined') return;
+      const provinceSel = document.getElementById(provinceId);
+      const citySel = document.getElementById(cityId);
+      const districtSel = document.getElementById(districtId);
+      const barangaySel = document.getElementById(barangayId);
+      if (!provinceSel || !citySel || !districtSel || !barangaySel) return;
+
+      const key = provinceSel.value + '|' + citySel.value;
+      const cityDistricts = (citySel.value && PH_LOCATIONS.informal_city_districts) ?
+        PH_LOCATIONS.informal_city_districts[key] : undefined;
+
+      if (cityDistricts) {
+        districtSel.disabled = false;
+        districtSel.innerHTML = ['<option value="">Piliin...</option>']
+          .concat(Object.keys(cityDistricts).map(d => `<option value="${d}">${d}</option>`)).join('');
+        barangaySel.innerHTML = '<option value="">Piliin muna ang district</option>';
+      } else {
+        districtSel.disabled = true;
+        districtSel.innerHTML = '<option value="">N/A - walang district na naka-record</option>';
+        // No district data for this city - Barangay falls back to
+        // populating directly from the full city list, unchanged from
+        // how this worked before District existed.
+        populateBarangays(provinceId, cityId, barangayId);
+      }
+    }
+
+    function populateBarangaysFromDistrict(provinceId, cityId, districtId, barangayId) {
+      if (typeof PH_LOCATIONS === 'undefined') return;
+      const provinceSel = document.getElementById(provinceId);
+      const citySel = document.getElementById(cityId);
+      const districtSel = document.getElementById(districtId);
+      const barangaySel = document.getElementById(barangayId);
+      if (!provinceSel || !citySel || !districtSel || !barangaySel) return;
+
+      const key = provinceSel.value + '|' + citySel.value;
+      const cityDistricts = PH_LOCATIONS.informal_city_districts ? PH_LOCATIONS.informal_city_districts[key] : undefined;
+      const barangays = (districtSel.value && cityDistricts && cityDistricts[districtSel.value]) ?
+        cityDistricts[districtSel.value] : [];
+      barangaySel.innerHTML = ['<option value="">Piliin...</option>'].concat(barangays.map(b => `<option value="${b}">${b}</option>`)).join('');
     }
 
     function populateBarangays(provinceId, cityId, barangayId) {
@@ -2430,7 +2497,7 @@ function initSite(activePage) {
       const curProv = document.getElementById('curProvince');
       if (curProv) {
         curProv.value = 'Iloilo';
-        populateCities('curProvince', 'curMunicipality', 'curBarangay');
+        populateCities('curProvince', 'curMunicipality', 'curDistrict', 'curBarangay');
       }
     })();
   </script>
