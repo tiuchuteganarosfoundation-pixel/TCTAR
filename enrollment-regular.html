@@ -1193,6 +1193,15 @@ footer {
 
 .req-upload-btn:hover { background: var(--green-light); }
 
+.req-upload-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  background: var(--white);
+  border-color: #C6D2C6;
+  color: var(--text-muted);
+}
+.req-upload-btn:disabled:hover { background: var(--white); }
+
 .req-upload-btn.uploaded {
   background: var(--green-dark);
   border-color: var(--green-dark);
@@ -1456,12 +1465,12 @@ footer {
                 </div>
                 <div class="form-row">
                   <label>Learner Reference Number (LRN)</label>
-                  <input type="text" id="lrn" class="only-numbers" maxlength="12" maxlength="12" placeholder="12 digits" />
-                  <p class="form-note">Kung mayroon</p>
+                  <input type="text" id="lrn" class="only-numbers" maxlength="12" placeholder="12 digits" disabled />
+                  <p class="form-note" id="lrnNote">Hindi kailangan - wala pang LRN ang bagong mag-aaral</p>
                 </div>
                 <div class="form-row">
                   <label>Grade Level na Papasukan <span class="req">*</span></label>
-                  <select id="gradeLevel" required>
+                  <select id="gradeLevel" required onchange="handleGradeLevelChange()">
                     <option value="">Piliin...</option>
                     <option>Kindergarten</option>
                     <option>Grade 1</option><option>Grade 2</option><option>Grade 3</option>
@@ -1673,8 +1682,8 @@ footer {
               </div>
             </div>
 
-            <!-- 8. SHS -->
-            <div class="form-section">
+            <!-- 8. SHS - only shown when Grade 11 or Grade 12 is selected above -->
+            <div class="form-section" id="shsSection" style="display:none;">
               <h3><span class="form-section-num">9</span>Senior High School <span class="hint">para sa Grade 11&#8211;12 lamang</span></h3>
               <div class="form-row-triple">
                 <div class="form-row">
@@ -1903,6 +1912,14 @@ function initSite(activePage) {
       document.getElementById('permAddressFields').style.display = same ? 'none' : 'block';
     }
 
+    // Section 9 (Senior High School) only applies to Grade 11/12 -
+    // hide it entirely until one of those is selected above.
+    function handleGradeLevelChange() {
+      const grade = document.getElementById('gradeLevel').value;
+      const isSHS = grade === 'Grade 11 (Senior High)' || grade === 'Grade 12 (Senior High)';
+      document.getElementById('shsSection').style.display = isSHS ? 'block' : 'none';
+    }
+
     let lastSummary = '';
 
     // ============================================================
@@ -1914,6 +1931,21 @@ function initSite(activePage) {
       document.getElementById('oldStudentLookupBlock').style.display = type === 'Lumang Mag-aaral' ? 'block' : 'none';
       document.getElementById('requirementsSection').style.display = type === 'Lumang Mag-aaral' ? 'none' : 'block';
       document.getElementById('lastSchoolSection').style.display = type === 'Transferee' ? 'block' : 'none';
+
+      // New students (Bagong Mag-aaral) don't have an LRN yet - DepEd
+      // hasn't issued one - so the field is disabled and cleared rather
+      // than left for a parent to guess at or leave blank. Transferee
+      // and Lumang Mag-aaral both keep it enabled exactly as before.
+      const isNewStudent = type === 'Bagong Mag-aaral';
+      const lrnInput = document.getElementById('lrn');
+      const lrnNote = document.getElementById('lrnNote');
+      lrnInput.disabled = isNewStudent;
+      if (isNewStudent) {
+        lrnInput.value = '';
+        lrnNote.textContent = 'Hindi kailangan - wala pang LRN ang bagong mag-aaral';
+      } else {
+        lrnNote.textContent = 'Kung mayroon';
+      }
 
       // PSA Birth Certificate + 2x2 Photo are required for everyone except
       // old students (whose checklist section is hidden entirely above).
@@ -1950,6 +1982,7 @@ function initSite(activePage) {
         if (!uploadedRequirementFiles[reqId]) checkbox.checked = false;
       }
       updateRequirementRowUI(reqId);
+      syncRequirementUploadDisabled(reqId);
     }
 
     // ============================================================
@@ -1985,6 +2018,7 @@ function initSite(activePage) {
       uploadedRequirementFiles[currentModalReqId] = file;
       document.getElementById(`req${currentModalReqId}`).checked = true;
       updateRequirementRowUI(currentModalReqId);
+      syncRequirementUploadDisabled(currentModalReqId);
 
       document.getElementById('reqModalPreviewName').textContent = file.name;
       document.getElementById('reqModalPreview').classList.add('show');
@@ -2014,6 +2048,22 @@ function initSite(activePage) {
         delete uploadedRequirementFiles[reqId];
         updateRequirementRowUI(reqId);
       }
+      syncRequirementUploadDisabled(reqId);
+    }
+
+    // The upload button for a requirement only makes sense once that
+    // requirement is checked (pre-checked or checked by the enrollee) -
+    // otherwise there's nothing to upload for.
+    function syncRequirementUploadDisabled(reqId) {
+      const checkbox = document.getElementById(`req${reqId}`);
+      const uploadBtn = document.getElementById(`reqUploadBtn${reqId}`);
+      uploadBtn.disabled = !checkbox.checked;
+    }
+
+    // Set the correct disabled state for every requirement's upload
+    // button on page load, based on whichever checkboxes start checked.
+    for (let i = 1; i <= 7; i++) {
+      syncRequirementUploadDisabled(i);
     }
 
     // Blocks submission until every CHECKED requirement has a file attached.
